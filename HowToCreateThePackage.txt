@@ -1,0 +1,4 @@
+1. Create a github project and clone it to your local computer
+2. Create the project skeleton
+      devtools::create("/home/fischuu/git/Fluidigm")
+
