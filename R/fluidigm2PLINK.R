@@ -1,4 +1,4 @@
-#' Turn fluidigm into PLINK format
+#' Turn Fluidigm Output Into PLINK Format
 #'
 #' This function loads a fluidigm output and turns it into a PLINK format
 #'
@@ -6,13 +6,17 @@
 #' @param out Out file name, keep empty to keep the original basename
 #' @param ymap Filepath to PlateD_withY.map file
 #' @param verbose Should the output be verbose, logical
-#' @return Something
+#' @param plot Logical, plot additional figures for conversion
+#' @param rearrange Logical, rearrange the ped/map output in order of ymap
+#' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, plots=TRUE){
+fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, plots=TRUE, rearrange=FALSE){
   ### Input checks
   ##############################################################################
   if(!file.exists(ymap)) stop("The file 'ymap' does not exist, please check the path!")
+  if(rearrange) stop("Currently rearranging the SNPs according to ymap file order is not possible.\n
+                     It will be implemented in a later version of this package.")
 
   ### Import the fluidigm data
   ##############################################################################
