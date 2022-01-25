@@ -1,13 +1,15 @@
 Package: Fluidigm
 Title: Handling Fluidigm Data
-Version: 0.1.1
+Version: 0.1.13
 Authors@R: 
     person("Daniel", "Fischer", , "Daniel.Fischer@luke.fi", role = c("aut", "cre"),
            comment = c(ORCID = "Y0000-0002-7513-683X"))
 Description: Handling fluidigm data
 License: `use_mit_license()`
 Encoding: UTF-8
+SystemRequirements: perl (>= 5.10.0), plink (>=1.07)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports:
-	data.table (>= 1.9.4)
+	data.table (>= 1.9.4),
+  reshape (>= 0.8.8)

@@ -2,14 +2,15 @@
 % Please edit documentation in R/fluidigm2PLINK.R
 \name{fluidigm2PLINK}
 \alias{fluidigm2PLINK}
-\title{Turn fluidigm into PLINK format}
+\title{Turn Fluidigm Output Into PLINK Format}
 \usage{
 fluidigm2PLINK(
   file,
   out = NA,
   ymap = "PlateD_withY.map",
-  verbose = TRUE,
-  plots = TRUE
+  plots = TRUE,
+  rearrange = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -19,10 +20,14 @@ fluidigm2PLINK(
 
 \item{ymap}{Filepath to PlateD_withY.map file}
 
-\item{verbose}{Should the output be verbose, logical}
+\item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+
+\item{verbose}{Should the output be verbose, logical or numerical}
+
+\item{plot}{Logical, plot additional figures for conversion}
 }
 \value{
-Something
+A ped/map file pair and optional diagnostic plots
 }
 \description{
 This function loads a fluidigm output and turns it into a PLINK format

@@ -5,18 +5,19 @@
 #' @param file Path to the input file
 #' @param out Out file name, keep empty to keep the original basename
 #' @param ymap Filepath to PlateD_withY.map file
-#' @param verbose Should the output be verbose, logical
 #' @param plot Logical, plot additional figures for conversion
 #' @param rearrange Logical, rearrange the ped/map output in order of ymap
+#' @param verbose Should the output be verbose, logical or numerical
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, plots=TRUE, rearrange=FALSE){
+fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, rearrange=FALSE, verbose=TRUE){
   ### Input checks
   ##############################################################################
   if(!file.exists(ymap)) stop("The file 'ymap' does not exist, please check the path!")
   if(rearrange) stop("Currently rearranging the SNPs according to ymap file order is not possible.\n
                      It will be implemented in a later version of this package.")
+  ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
   ### Import the fluidigm data
   ##############################################################################
@@ -25,9 +26,11 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
     dirname <- dirname(file)
     filename <- basename(file)
   # Read the fluidigm into a data table
-    dd1 <- data.table::fread(file, skip="SNP Converted Calls")
+    tmp <- readLines(file)
+    skip <- which(tmp=="SNP Converted Calls")
+    dd1 <- data.table::fread(file, skip=skip +1)
   # Turn the data table into a data fram
-    dd <- as.data.frame(unclass(dd1[-1,]))
+    dd <- as.data.frame(unclass(dd1))
   # Add new level to V2
     levels(dd$V2)<-c(levels(dd$V2),"Chipblank")
   # Adjust the names for NTC
@@ -45,10 +48,20 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
   # Check that markers are in correct order
     truemap <- read.table(ymap, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
     comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
+    newOrder <- 1:nrow(ddmap)
+
     if(sum(cumprod(comp)) < nrow(ddmap)){
-      stop("WARNING! Markers are not in correct order")
+      if(rearrange){
+        if(verbose>1) print("Markers are not in the same order as ymap file, rearrange the output!")
+        for(i in 1:nrow(truemap)){
+          newOrder[i] <- which(truemap$MAP[i] == ddmap[,2])
+        }
+        ddmap <- ddmap[newOrder,]
+      } else {
+        stop("ERROR!!! Markers are not in correct order. Either change the order or set rearrange=TRUE to adjust the order of fluidigm file.")
+      }
     } else {
-      if(verbose) print("OK markers are in correct order")
+      if(verbose>1) print("Markers are in the same order as ymap file")
     }
   # Export the .map file
     map.filename <- gsub(".csv", ".map", filename)
@@ -57,9 +70,13 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
   ### Create the PED file
   ##############################################################################
   # Input checks
+  #  Maybe rearrange the file
+    if(rearrange){
+      dd <- dd[,c(1,2,newOrder+2)]
+    }
     ddped1 <- dd[-1,]
-    if(verbose) cat("Number of samples in data:",nrow(ddped1), "TODO: CHECK THIS!!!\n")
-    if(verbose) cat("Number of markers in data:",ncol(ddped1), "TODO: CHECK THIS!!!\n")
+    if(verbose>1) cat("Number of samples in data:",nrow(ddped1), "TODO: CHECK THIS!!!\n")
+    if(verbose>1) cat("Number of markers in data:",ncol(ddped1), "TODO: CHECK THIS!!!\n")
 
   # Add columns for sex-information
     ddped <- ddped1
@@ -71,13 +88,14 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
     ddped$matID <- 0
     ddped$pheno <- 0
 
-  # Rearange to get right order -- use indexing
+  # Rearrange to get right order -- use indexing
     p <- ncol(ddped)-2
     m <- ncol(ddped)-1
     s <- ncol(ddped)-3
     ph <- ncol(ddped)
     l <- ncol(ddped)-5
     ddped2<-ddped[,c(1,2,p,m,s,ph,3:l)]
+  # If order needed t obe rearranned
 
   # TODO: This is not effective and for now rather naive
   # reformat genotype (and missing genotype) data
@@ -109,7 +127,7 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
       genomark<-rbind(genomark,b)
     }
     genomark[is.na(genomark)]<- 0
-    if(verbose){
+    if(verbose>1){
       cat("Summary of call rate markers\n
              --------------------------------------\n")
       print(summary(genomark))
@@ -128,7 +146,7 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
       genosamp <- rbind(genosamp,c)
     }
     genosamp[is.na(genosamp)]<- 0
-    if(verbose){
+    if(verbose>1){
       cat("Summary of genotyping success\n
              --------------------------------------\n")
       print(summary(genosamp))
@@ -153,5 +171,6 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", verbose=TRUE, 
        hist(genosamp, breaks=96, xlim=c(0,96), main='', xlab="Genotyping success, samples")
        dev.off()
     }
-  if(verbose)print("Conversion: DONE!\n")
+
+  if(verbose>0)cat("\n ### Conversion: DONE! ",date(),"\n","##############################################################\n")
 }
