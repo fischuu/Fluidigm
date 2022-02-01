@@ -12,13 +12,16 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-calculatePairwiseSimilarities <- function(file, db="DataBase.ped", map="PlateDnoY.map", out=NA, verbose=TRUE){
+calculatePairwiseSimilarities <- function(file, db="DataBase.ped", map=NA, out=NA, verbose=TRUE){
 
    ### Input check
    ##############################################################################
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
     ifelse(verbose>1, intern.param <- FALSE, intern.param <- TRUE)
     if(is.na(out)) out <- paste0(file,"_oDB")
+
+    file <- gsub("^./", "", file)
+    out <- gsub("^./", "", out)
 
    # Running plink
    # Merge the genotype output with the existing genotype database (example database included here "DataBase.ped"):

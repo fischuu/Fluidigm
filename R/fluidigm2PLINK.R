@@ -11,21 +11,19 @@
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, rearrange=FALSE, verbose=TRUE){
+fluidigm2PLINK <- function(file, out=NA, ymap=NA, plots=TRUE, rearrange=FALSE, verbose=TRUE){
   ### Input checks
   ##############################################################################
   if(!file.exists(ymap)) stop("The file 'ymap' does not exist, please check the path!")
-  if(rearrange) stop("Currently rearranging the SNPs according to ymap file order is not possible.\n
-                     It will be implemented in a later version of this package.")
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
-  ### Import the fluidigm data
+  ### Import the fluidigm data from csv file
   ##############################################################################
 
   # Extract the file and directory name
     dirname <- dirname(file)
     filename <- basename(file)
-  # Read the fluidigm into a data table
+  # Read the fluidigm data into a data table
     tmp <- readLines(file)
     skip <- which(tmp=="SNP Converted Calls")
     dd1 <- data.table::fread(file, skip=skip +1)
@@ -45,24 +43,29 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
     ddmap <- data.frame(matrix(0, nrow = length(snpIDs), ncol = 4))
   # Add the SNP-IDs to the map
     ddmap$X2 <- t(snpIDs)
-  # Check that markers are in correct order
-    truemap <- read.table(ymap, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
-    comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
     newOrder <- 1:nrow(ddmap)
 
-    if(sum(cumprod(comp)) < nrow(ddmap)){
-      if(rearrange){
-        if(verbose>1) print("Markers are not in the same order as ymap file, rearrange the output!")
-        for(i in 1:nrow(truemap)){
-          newOrder[i] <- which(truemap$MAP[i] == ddmap[,2])
+  if(!is.na(ymap)){
+    # Check that markers are in correct order
+      truemap <- read.table(ymap, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
+      comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
+
+      if(sum(cumprod(comp)) < nrow(ddmap)){
+        if(rearrange){
+          if(verbose>1) print("Markers are not in the same order as ymap file, rearrange the output!")
+          for(i in 1:nrow(truemap)){
+            newOrder[i] <- which(truemap$MAP[i] == ddmap[,2])
+          }
+          ddmap <- ddmap[newOrder,]
+        } else {
+          stop("ERROR!!! Markers are not in correct order. Either change the order or set rearrange=TRUE to adjust the order of fluidigm file.")
         }
-        ddmap <- ddmap[newOrder,]
       } else {
-        stop("ERROR!!! Markers are not in correct order. Either change the order or set rearrange=TRUE to adjust the order of fluidigm file.")
+        if(verbose>1) print("Markers are in the same order as ymap file")
       }
-    } else {
-      if(verbose>1) print("Markers are in the same order as ymap file")
-    }
+  } else {
+     if(verbose>1) cat("No map file provided, create one based on marker IDs from csv file\n")
+  }
   # Export the .map file
     map.filename <- gsub(".csv", ".map", filename)
     write.table(ddmap, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
@@ -75,8 +78,10 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
       dd <- dd[,c(1,2,newOrder+2)]
     }
     ddped1 <- dd[-1,]
-    if(verbose>1) cat("Number of samples in data:",nrow(ddped1), "TODO: CHECK THIS!!!\n")
-    if(verbose>1) cat("Number of markers in data:",ncol(ddped1), "TODO: CHECK THIS!!!\n")
+    number_samples <- nrow(ddped1)
+    if(verbose>1) cat("Number of samples in data:",number_samples, "\n")
+    number_markers <- ncol(ddped1)-2
+    if(verbose>1) cat("Number of markers in data:",number_markers, "\n")
 
   # Add columns for sex-information
     ddped <- ddped1
@@ -89,13 +94,13 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
     ddped$pheno <- 0
 
   # Rearrange to get right order -- use indexing
-    p <- ncol(ddped)-2
-    m <- ncol(ddped)-1
-    s <- ncol(ddped)-3
-    ph <- ncol(ddped)
+    p <- which(colnames(ddped)=="patID")
+    m <- which(colnames(ddped)=="matID")
+    s <- which(colnames(ddped)=="sexnum")
+    ph <- which(colnames(ddped)=="pheno")
     l <- ncol(ddped)-5
     ddped2<-ddped[,c(1,2,p,m,s,ph,3:l)]
-  # If order needed t obe rearranned
+  # If order needed to be rearranned
 
   # TODO: This is not effective and for now rather naive
   # reformat genotype (and missing genotype) data
@@ -115,16 +120,16 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
     ddped2[ddped2 == "NTC"] <- "0 0"
     ddped2[ddped2 == "No Call"] <- "0 0"
 
-    # export ped file
+  # export ped file
     ped.filename <- gsub(".csv", ".ped", filename)
     write.table(ddped2, file = file.path(dirname, ped.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
   ### Create summary statistics
   # call rate markers
-    genomark<-table(ddped2[,7]!="0 0")[2]
+    genomark <- table(ddped2[,7]!="0 0")["TRUE"]
     for(l in 8:ncol(ddped2)){
-      b<-table(ddped2[,l]!="0 0")[2]
-      genomark<-rbind(genomark,b)
+      b <- table(ddped2[,l]!="0 0")["TRUE"]
+      genomark <- rbind(genomark,b)
     }
     genomark[is.na(genomark)]<- 0
     if(verbose>1){
@@ -135,14 +140,14 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
     if(plots){
       fig1.filename <- sub(".csv", ".call_rate_markers.png", filename)
       png(file.path(dirname, fig1.filename), width=1200, height=1200)
-         hist(genomark, breaks=96, xlim=c(0,96), main='', xlab="Call rate, markers")
+         hist(genomark, breaks=number_markers, xlim=c(0,ceiling(number_markers/10)*10 ), main='', xlab="Call rate, markers")
       dev.off()
     }
 
   # genotyping success samples
-    genosamp <- table(ddped2[1,c(7:ncol(ddped2))]!="0 0")[2]
+    genosamp <- table(ddped2[1,c(7:ncol(ddped2))]!="0 0")["TRUE"]
     for(m in 2:nrow(ddped2)){
-      c<-table(ddped2[m,c(7:ncol(ddped2))]!="0 0")[2]
+      c <- table(ddped2[m,c(7:ncol(ddped2))]!="0 0")["TRUE"]
       genosamp <- rbind(genosamp,c)
     }
     genosamp[is.na(genosamp)]<- 0
@@ -154,7 +159,7 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
     if(plots){
       fig2.filename <- sub(".csv", ".genotyping_success_samples.png", filename)
       png(file.path(dirname, fig2.filename), width=1200, height=1200)
-         hist(genosamp, breaks=96, xlim=c(0,96), main='', xlab="Genotyping success, samples")
+         hist(genosamp, breaks=number_samples, xlim=c(0,ceiling(number_samples/10)*10), main='', xlab="Genotyping success, samples")
       dev.off()
     }
 
@@ -167,8 +172,10 @@ fluidigm2PLINK <- function(file, out=NA, ymap="PlateD_withY.map", plots=TRUE, re
        text(1,1, paste("Input file name: ", filename),font=2, pos=1)
        text(1,1, paste("Number of markers in MAP file: ", nrow(ddmap)), pos=1, offset=2)
        text(1,1, paste("Number of samples in PED file: ", nrow(ddped2)), pos=1, offset=3)
-       hist(genomark, breaks=96, xlim=c(0,96), main='', xlab="Call rate, markers")
-       hist(genosamp, breaks=96, xlim=c(0,96), main='', xlab="Genotyping success, samples")
+       text(1,1, paste("Output map file name: ", map.filename), pos=1, offset=4)
+       text(1,1, paste("Output ped file name: ", ped.filename), pos=1, offset=5)
+       hist(genomark, breaks=number_markers, xlim=c(0,ceiling(number_markers/10)*10 ), main='', xlab="Call rate, markers")
+       hist(genosamp, breaks=number_samples, xlim=c(0,ceiling(number_samples/10)*10 ), main='', xlab="Genotyping success, samples")
        dev.off()
     }
 
