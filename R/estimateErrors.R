@@ -12,7 +12,7 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
+estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
                            female.Xtot=8, female.hetXtot=3, warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
 
   # Input checks
@@ -33,14 +33,20 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
     if(sum(n>1)>0) replicates <- TRUE
     remove_those <- names(n)[n!=keep.rep]
     if(!is.na(neg_controls)) remove_those <- c(remove_those, neg_controls)
-    ped <- ped1[-which(is.element(ped1$V2, remove_those)),]
-    ped$V2 <- factor(ped$V2)
-    if(verbose>1){
-      cat("Remove samples (based on too low/high repitition \n------------------------------------------------\n")
-      for(i in 1:length(remove_those)){
-        cat(remove_those[i],"\n")
+    if(length(which(is.element(ped1$V2, remove_those)))>0){
+      ped <- ped1[-which(is.element(ped1$V2, remove_those)),]
+      ped$V2 <- factor(ped$V2)
+      if(verbose>1){
+        cat("Remove samples (based on too low/high repitition \n------------------------------------------------\n")
+        for(i in 1:length(remove_those)){
+          cat(remove_those[i],"\n")
+        }
       }
+    } else {
+      if(verbose>0) warning("No samples were removed, please check if this is correct or if e.g. wrong sample names are provided for negative controls?!\n")
+      ped <- ped1
     }
+
 
  # Remove y-chromosome based markers
   if(sum(!is.na(y.marker))>0 ){
@@ -50,7 +56,7 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
     } else {
       marker_pos <- which(is.element(map1$V2, y.marker))
     }
-    if(length(marker_pos)==0) warning("No y-markers found. Please check your option y.marker to be either numeric and marker names. The map file needs to have then either information to be present.")
+    if(length(marker_pos)==0) warning("No y-markers found. Please check your option y.marker to be either numeric and marker names. The map file needs to have then either information to be present.\n")
     if(verbose>1){
       cat("Remove markers\n---------------------------\n")
       for(i in 1:length(marker_pos)){
@@ -84,12 +90,12 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
       # check if both replicates are identical:
       if(nrow(gen)>1){
         replicates <- TRUE
-        if(verbose>1) if(i==1) warning("Replicates found, object gensim will contain the agreement between replicate 1 and 2. ALL OTHERS WILL HERE BE IGNORED AT THE MOMENT!!!")
+        if(verbose>1) if(i==1) warning("Replicates found, object gensim will contain the agreement between replicate 1 and 2. ALL OTHERS WILL HERE BE IGNORED AT THE MOMENT!!!\n")
         for(j in 1:ncol(gen)){
           gensim[j,i]<- gen[1,j]==gen[2,j]
         }
       } else {
-        if(verbose>1) if(i==1) warning("No replicates found, object gensim will contain only TRUE and NA")
+        if(verbose>1) if(i==1) warning("No replicates found, object gensim will contain only TRUE and NA\n")
         for(j in 1:ncol(gen)){
           gensim[j,i] <- gen[1,j]==gen[1,j]
         }
@@ -112,7 +118,7 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
       summs[k,6] <- summs[k,4]/(summs[k,2]+summs[k,3]+summs[k,4])*100
     }
 
-    if(!replicates) warning("There are no replicates, not mesures from summs are meaningful, also the marker classification is not based on allele_error statistic!!!")
+    if(!replicates) if(verbose>1) warning("There are no replicates, not all values in summs are meaningful, also the marker classification is not based on the allele_error statistic!!!\n")
 
   # Add columns: "No_markers_repl1" and "No_markers_repl2"
     summs$No_markers_repl1 <- NA
@@ -176,7 +182,14 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
         lines(c(-5,15), c(5,5), lty=2)
         lines(c(15,15), c(-5,5), lty=2)
         lines(c(85,85), c(-5,100), lty=5)
-        corA <- cor.test(summs$Marker_dropout, summs$Allele_error)
+        if(replicates){
+          corA <- cor.test(summs$Marker_dropout, summs$Allele_error)
+        } else {
+          corA <- list()
+          corA$estimate <- NA
+          corA$p.value <- NA
+        }
+
         plot(2,2, type="n", axes=FALSE, ylab=" ", xlab=" ")
         text(2,2, paste("Input file name: ", filename),font=1, pos=1)
         text(2,2, paste("R-value (for replicates): ", corA$estimate), pos=1, offset=2)
@@ -200,7 +213,7 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
     # get all genotypes for individual i
       ind <- unique(nam)[i]
       indgen <- ped[ped$V2==ind,]
-      if(verbose>1){
+      if(verbose>1 && i==1){
         cat("\nConsider the following columns in ped-file:\n")
         for(indY in 1:(length(remove_y)/2)){
           writeThis <- indY*2
@@ -401,15 +414,21 @@ estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, pl
       if(!is.na(db)){
         if(file.exists(file.path(dirname, db))){
           database <- read.table(file = file.path(dirname, db), sep="\t", header=FALSE)
-          if(verbose>0){
-            cat("Database file found, imported", nrow(db), "samples from the existing database\n")
+          if(verbose>0) cat("Database file found, imported", nrow(db), "samples from the existing database\n")
+          if(appendSamplesToDB){
+            colnames(database) <- colnames(GoodPed)
+            if(sum(is.element(GoodPed[,2], database[,2]))>(nrow(GoodPed)/2)) warning("There are lots of samples from current file already in the database, is that expected and wanted?\n")
+            rownames(database) <- 1:nrow(database)
+            rownames(GoodPed) <- (nrow(database)+1):(nrow(database)+nrow(GoodPed))
             database <- rbind(database, GoodPed)
+            rownames(database) <- NULL
+            write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
           }
         } else {
           if(verbose>0) cat("Provided database file not found, create a new one with existing data!\n")
           database <- GoodPed
+          write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
         }
-        write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
       }
 
     # Create .map file without the Y-markers:

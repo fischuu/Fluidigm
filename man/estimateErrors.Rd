@@ -6,9 +6,23 @@
 \usage{
 estimateErrors(
   file,
-  keep.rep = 2,
-  remove.y = TRUE,
+  db = NA,
+  appendSamplesToDB = FALSE,
+  keep.rep = 1,
+  y.marker = NA,
+  x.marker = NA,
   plots = TRUE,
+  neg_controls = NA,
+  allele_error = 5,
+  marker_dropout = 15,
+  no_marker = 50,
+  male.y = 3,
+  male.hetX = 0,
+  female.y = 0,
+  female.Xtot = 8,
+  female.hetXtot = 3,
+  warning.noYtot = 2,
+  warning.noHetXtot = 3,
   verbose = TRUE
 )
 }
@@ -17,7 +31,7 @@ estimateErrors(
 
 \item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
 
-\item{remove.y}{logical, Remove markers located on y-chromosome}
+\item{y.marker}{logical, Remove markers located on y-chromosome}
 
 \item{plots}{logical, shall plots be created?}
 

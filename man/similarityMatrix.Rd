@@ -11,6 +11,7 @@ similarityMatrix(
   ped.file = NA,
   group = NA,
   plots = TRUE,
+  similarity = 0.85,
   verbose = TRUE
 )
 }

@@ -6,8 +6,8 @@
 \usage{
 calculatePairwiseSimilarities(
   file,
-  db = "DataBase.ped",
-  map = "PlateDnoY.map",
+  db = NA,
+  map = NA,
   out = NA,
   verbose = TRUE
 )

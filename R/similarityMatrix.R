@@ -14,7 +14,7 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, verbose=TRUE){
+similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, similarity=0.85, verbose=TRUE){
 
   if(is.na(file)) stop("ERROR: No input file provided")
   if(is.na(mibs.file)) mibs.file <- paste0(file,".mibs")
@@ -32,7 +32,12 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
     ped <- read.table(ped.file)
     nam <- ped[,2]
     names(mat) <- nam
-    row.names(mat) <- nam
+    if(sum(is.element(names(table(table(nam))), "1")) && length(is.element(names(table(table(nam))), "1"))==1 ){
+      row.names(mat) <- nam
+    } else {
+      row.names(mat) <- paste(nam, rownames(mat),sep="_row")
+    }
+
 
   # convert from matrix to long format
     dd <- as.matrix(mat)
@@ -75,8 +80,8 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
     }
 
   # output all pairwise similarities over 85%
-    ddsim <- ddl[ddl$similarity>=0.85,]
-    write.table(ddsim, file=paste0(file,"_similar_0.85_genotypes.rout"), quote=FALSE, sep=",", row.names=FALSE)
+    ddsim <- ddl[ddl$similarity>=similarity,]
+    write.table(ddsim, file=paste0(file,paste0("_similar_",similarity,"_genotypes.rout") ), quote=FALSE, sep=",", row.names=FALSE)
 
   if(!is.na(group)){
     ### RUN BELOW THIS ONLY IF YOU WANT SUMMARY OUTPUT FOR EACH SAMPLE SEPARATELLY ###********************************************

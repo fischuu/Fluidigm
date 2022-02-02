@@ -7,9 +7,9 @@
 fluidigm2PLINK(
   file,
   out = NA,
-  ymap = "PlateD_withY.map",
+  map = NA,
   plots = TRUE,
-  rearrange = FALSE,
+  rearrange = TRUE,
   verbose = TRUE
 )
 }
@@ -18,7 +18,7 @@ fluidigm2PLINK(
 
 \item{out}{Out file name, keep empty to keep the original basename}
 
-\item{ymap}{Filepath to PlateD_withY.map file}
+\item{map}{Filepath to PlateD_withY.map file}
 
 \item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
 

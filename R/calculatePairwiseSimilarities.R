@@ -35,7 +35,7 @@ calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, verbose=T
          plinkCommand <- paste0("plink --noweb --file ",file," --merge ",db," ",map," --recode --out ",out)
 
          if(verbose>1){
-             cat("Run the following PLINK command:\n", plinkCommand)
+             cat("Run the following PLINK command:\n", plinkCommand, "\n")
          }
          # Run Plink
          system(plinkCommand, intern=intern.param)

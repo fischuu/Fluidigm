@@ -7,13 +7,15 @@
 fluidigmAnalysisWrapper(
   file,
   out = NA,
-  db,
-  ymap = "PlateD_withY.map",
-  woymap,
-  keep.rep = 2,
-  remove.y = TRUE,
+  db = NA,
+  appendSamplesToDB = FALSE,
+  map = NA,
+  keep.rep = 1,
+  neg_controls = NA,
+  y.marker = NA,
+  x.marker = NA,
   plots = TRUE,
-  rearrange = FALSE,
+  rearrange = TRUE,
   group = NA,
   verbose = TRUE
 )
@@ -25,15 +27,15 @@ fluidigmAnalysisWrapper(
 
 \item{db}{Filepath to database file}
 
-\item{ymap}{Filepath to PlateD_withoutY.map file}
-
 \item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
 
-\item{remove.y}{logical, Remove markers located on y-chromosome}
+\item{y.marker}{logical, Remove markers located on y-chromosome}
 
 \item{plots}{logical, shall plots be created?}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
+
+\item{ymap}{Filepath to PlateD_withoutY.map file}
 }
 \value{
 A list containing the following elements:
