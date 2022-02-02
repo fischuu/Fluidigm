@@ -4,17 +4,17 @@
 #'
 #' @param file Path to the input file
 #' @param out Out file name, keep empty to keep the original basename
-#' @param ymap Filepath to PlateD_withY.map file
+#' @param map Filepath to PlateD_withY.map file
 #' @param plot Logical, plot additional figures for conversion
 #' @param rearrange Logical, rearrange the ped/map output in order of ymap
 #' @param verbose Should the output be verbose, logical or numerical
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file, out=NA, ymap=NA, plots=TRUE, rearrange=FALSE, verbose=TRUE){
+fluidigm2PLINK <- function(file, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE){
   ### Input checks
   ##############################################################################
-  if(!file.exists(ymap)) stop("The file 'ymap' does not exist, please check the path!")
+  if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
   ### Import the fluidigm data from csv file
@@ -45,14 +45,14 @@ fluidigm2PLINK <- function(file, out=NA, ymap=NA, plots=TRUE, rearrange=FALSE, v
     ddmap$X2 <- t(snpIDs)
     newOrder <- 1:nrow(ddmap)
 
-  if(!is.na(ymap)){
+  if(!is.na(map)){
     # Check that markers are in correct order
-      truemap <- read.table(ymap, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
+      truemap <- read.table(map, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
       comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
 
       if(sum(cumprod(comp)) < nrow(ddmap)){
         if(rearrange){
-          if(verbose>1) print("Markers are not in the same order as ymap file, rearrange the output!")
+          if(verbose>1) print("Markers are not in the same order as in the provided map file, rearrange the output!")
           for(i in 1:nrow(truemap)){
             newOrder[i] <- which(truemap$MAP[i] == ddmap[,2])
           }
@@ -61,11 +61,17 @@ fluidigm2PLINK <- function(file, out=NA, ymap=NA, plots=TRUE, rearrange=FALSE, v
           stop("ERROR!!! Markers are not in correct order. Either change the order or set rearrange=TRUE to adjust the order of fluidigm file.")
         }
       } else {
-        if(verbose>1) print("Markers are in the same order as ymap file")
+        if(verbose>1) print("Markers are in the same order as map file")
       }
   } else {
      if(verbose>1) cat("No map file provided, create one based on marker IDs from csv file\n")
   }
+  # Populate the new map file with information from the provided map file
+    for(i in 1:nrow(ddmap)){
+      if(truemap[i,1]!=0) ddmap[i,1] <- truemap[i,1]
+      if(truemap[i,3]!=0) ddmap[i,3] <- truemap[i,3]
+      if(truemap[i,4]!=0) ddmap[i,4] <- truemap[i,4]
+    }
   # Export the .map file
     map.filename <- gsub(".csv", ".map", filename)
     write.table(ddmap, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)

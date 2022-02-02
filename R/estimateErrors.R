@@ -12,7 +12,7 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
+estimateErrors <- function(file, db=NA, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
                            female.Xtot=8, female.hetXtot=3, warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
 
   # Input checks
@@ -27,8 +27,10 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     ped1 <- read.table(file, stringsAsFactors=TRUE) # make sure all genotype columns are treated as factors
     map1 <- read.table(file.path(dirname, mapfile), stringsAsFactors=TRUE) # make sure all genotype columns are treated as factors
 
-  # Only take individuals with exactly 2 replicates (removes neg controls):
+  # Check to remove replicates (removes neg controls):
     n <- table(ped1$V2)
+    replicates <- FALSE
+    if(sum(n>1)>0) replicates <- TRUE
     remove_those <- names(n)[n!=keep.rep]
     if(!is.na(neg_controls)) remove_those <- c(remove_those, neg_controls)
     ped <- ped1[-which(is.element(ped1$V2, remove_those)),]
@@ -41,8 +43,14 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     }
 
  # Remove y-chromosome based markers
-  if(!is.na(y.marker)){
-    marker_pos <- which(is.element(map1$V2, y.marker))
+  if(sum(!is.na(y.marker))>0 ){
+    marker_pos <- NULL
+    if(sum(is.numeric(y.marker))>0 | sum(y.marker=="Y")>0 ){
+      marker_pos <- which(is.element(map1$V1, y.marker))
+    } else {
+      marker_pos <- which(is.element(map1$V2, y.marker))
+    }
+    if(length(marker_pos)==0) warning("No y-markers found. Please check your option y.marker to be either numeric and marker names. The map file needs to have then either information to be present.")
     if(verbose>1){
       cat("Remove markers\n---------------------------\n")
       for(i in 1:length(marker_pos)){
@@ -54,19 +62,6 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     ped_wo_y <- ped[,-remove_y]
   }
 
-  # Remove x-chromosome based markers
-    x_marker_pos <- grep("^X_", map1$V2)
-    if(length(x_marker_pos)>0){
-      if(verbose>1){
-        cat("Remove markers\n---------------------------\n")
-        for(i in 1:length(x_marker_pos)){
-          cat(as.character(map1$V2[x_marker_pos[i]]),"\n")
-        }
-      }
-      remove_x <- c(marker_pos*2+5, marker_pos*2+6)
-      map1_wo_x <- map1[-marker_pos,]
-    }
-
   ### Start main analyses for summary output
   ##############################################################################
 
@@ -77,7 +72,6 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
 
   # Check if first and second run of sample have the same genotype
   # loop over all individuals (SAMPLE NAME ends up in header row)
-    replicates <- FALSE
     for(i in 1:length(unique(nam))){
       # get all genotypes for individual i
         ind <- unique(nam)[i]
@@ -118,7 +112,7 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
       summs[k,6] <- summs[k,4]/(summs[k,2]+summs[k,3]+summs[k,4])*100
     }
 
-    if(!replicates) warning("There are no replicates, not mesures from summs are meningful, also the marker classification is not based on allele_error statistic!!!")
+    if(!replicates) warning("There are no replicates, not mesures from summs are meaningful, also the marker classification is not based on allele_error statistic!!!")
 
   # Add columns: "No_markers_repl1" and "No_markers_repl2"
     summs$No_markers_repl1 <- NA
@@ -150,14 +144,19 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     levels(summs$categ) <- c("GOOD","RERUN","BAD")
 
     if(verbose > 1){
-      cat("Marker classification is based on those threshols:\n",
+      cat("Marker classification is based on those thresholds:\n",
           "Allele errors between replicates (if present):", allele_error,"\n",
           "Marker dropout :", marker_dropout,"\n",
           "Number of missing marker per replicate:",no_marker , "\n")
     }
     summs$categ[summs$Allele_error > allele_error] <- "RERUN"
     summs$categ[summs$Marker_dropout > marker_dropout] <- "RERUN"
-    summs$categ[summs$No_markers_repl1 > no_marker & summs$No_markers_repl2 > no_marker] <- "BAD"
+    if(replicates){
+      summs$categ[summs$No_markers_repl1 > no_marker & summs$No_markers_repl2 > no_marker] <- "BAD"
+    } else {
+      summs$categ[summs$No_markers_repl1 > no_marker] <- "BAD"
+    }
+
 
   ### Summarise error rates in figure
     culr <- ifelse(summs$categ=="GOOD", "blue", "red")
@@ -201,7 +200,6 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     # get all genotypes for individual i
       ind <- unique(nam)[i]
       indgen <- ped[ped$V2==ind,]
-#      genY <- indgen[,c(149, 173, 197)]
       if(verbose>1){
         cat("\nConsider the following columns in ped-file:\n")
         for(indY in 1:(length(remove_y)/2)){
@@ -229,8 +227,14 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
 
   # Check genotypes of X markers
   # loop over all individuals (i)
-    x_marker_pos <- which(is.element(map1$V2, x.marker ))
-    remove_x <- c(x_marker_pos*2+5, x_marker_pos*2+6)
+    if(sum(is.na(x.marker))>0) stop("No x.marker provided, please do this.")
+    x_marker_pos <- NULL
+    if(sum(is.numeric(x.marker))>0 | sum(x.marker=="X")>0){
+       x_marker_pos <- which(is.element(map1$V1, x.marker))
+    } else {
+       x_marker_pos <- which(is.element(map1$V2, x.marker))
+    }
+    remove_x <- sort(c(x_marker_pos*2+5, x_marker_pos*2+6))
 
     if(verbose>1){
       cat("Base x-marker analysis on the following markers:\n")
@@ -249,10 +253,6 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
       genX[] <- lapply(genX, factor) 				# 3 new lines - change all variables in genX to factor
       levs <- unique(unlist(lapply(genX,levels)))		# Get vector of all levels that appear in the data.frame
       genX <- data.frame(lapply(genX,factor,levels=levs))	# Set these as the levels for each column
-      genX <- genX[,order(colnames(genX))]
-
-      if(verbose>1) cat("Order of genotypes that are compared i vs i+1 - check that they are in consecutive order!\n",
-                        colnames(genX),"\n")
 
     # count number of of heterozygote genotypes
       Xgeno1 <- 0
@@ -263,7 +263,11 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
       Xgeno1[genX[1,9] != genX[1,10]]  <- Xgeno1+1
       Xgeno1[genX[1,11] != genX[1,12]]  <- Xgeno1+1
 
-      Xgeno2 <- 0
+      if(replicates){
+        Xgeno2 <- 0
+      } else {
+        Xgeno2 <- NA
+      }
       Xgeno2[genX[2,1] != genX[2,2]]  <- Xgeno2+1
       Xgeno2[genX[2,3] != genX[2,4]]  <- Xgeno2+1
       Xgeno2[genX[2,5] != genX[2,6]]  <- Xgeno2+1
@@ -274,16 +278,17 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     # put these in the right place in table "summs"
       summs$noHetX1[summs$Ind==ind] <- Xgeno1
       summs$noHetX2[summs$Ind==ind] <- Xgeno2
-      summs$noHetXtot[summs$Ind==ind] <- Xgeno1 + Xgeno2
+      summs$noHetXtot[summs$Ind==ind] <- sum(Xgeno1,Xgeno2, na.rm=TRUE)
 
     # count total number of working X-markers
       Xtgeno1 <- sum(genX[1,]!=0, na.rm=TRUE)/2
       Xtgeno2 <- sum(genX[2,]!=0, na.rm=TRUE)/2
+      if(!replicates) Xtgeno2 <- NA
 
     # put these in the right place in table "summs"
       summs$noX1[summs$Ind==ind] <- Xtgeno1
       summs$noX2[summs$Ind==ind] <- Xtgeno2
-      summs$noXtot[summs$Ind==ind] <- Xtgeno1 + Xtgeno2
+      summs$noXtot[summs$Ind==ind] <- sum(Xtgeno1,Xtgeno2, na.rm=TRUE)
     }
 
     # Add column for assigned sex, and fill in using criteria below
@@ -391,6 +396,21 @@ estimateErrors <- function(file, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRU
     # export ped file
       ped.filename <- gsub(".ped", ".GOOD.ped", filename)
       write.table(GoodPed, file = file.path(dirname, ped.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
+
+    # Create a database
+      if(!is.na(db)){
+        if(file.exists(file.path(dirname, db))){
+          database <- read.table(file = file.path(dirname, db), sep="\t", header=FALSE)
+          if(verbose>0){
+            cat("Database file found, imported", nrow(db), "samples from the existing database\n")
+            database <- rbind(database, GoodPed)
+          }
+        } else {
+          if(verbose>0) cat("Provided database file not found, create a new one with existing data!\n")
+          database <- GoodPed
+        }
+        write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
+      }
 
     # Create .map file without the Y-markers:
       if(!is.na(y.marker)){

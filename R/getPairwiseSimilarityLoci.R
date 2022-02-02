@@ -19,9 +19,9 @@ getPairwiseSimilarityLoci <- function(file, verbose=TRUE){
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
   ifelse(verbose>1, intern.param <- FALSE, intern.param <- TRUE)
 
-  out <- paste0(file,"_oDB.pairs")
-  pedfile <- paste0(file, "_oDB.ped")
-  mibsfile <- paste0(file,"_oDB.mibs")
+  out <- paste0(file,".pairs")
+  pedfile <- paste0(file, ".ped")
+  mibsfile <- paste0(file,".mibs")
 
   package.dir <- find.package('Fluidigm')
   perl.dir <- file.path(package.dir,'perl')

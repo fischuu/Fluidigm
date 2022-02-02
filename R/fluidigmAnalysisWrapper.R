@@ -16,7 +16,7 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-fluidigmAnalysisWrapper <- function(file, out=NA, db, ymap=NA, woymap,  keep.rep=2, neg_controls=NA, y.marker=NA, x.marker=NA, plots=TRUE, rearrange=FALSE, group=NA, verbose=TRUE){
+fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, map=NA, woymap=NA,  keep.rep=2, neg_controls=NA, y.marker=NA, x.marker=NA, plots=TRUE, rearrange=FALSE, group=NA, verbose=TRUE){
 
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
@@ -26,16 +26,28 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db, ymap=NA, woymap,  keep.rep
   dirname <- dirname(file)
   pedfile <- gsub("csv$","ped",filename)
   plinkfile <- gsub("csv$","GOOD",filename)
+  path_plinkfile <- file.path(dirname,plinkfile)
+  if(dirname==".") path_plinkfile <- gsub("./", "", path_plinkfile)
+  if(file.exists(file.path(dirname, db))){
+    newDB <- FALSE
+  } else {
+    newDB <- TRUE
+  }
 
-  fluidigm2PLINK(file=file, out=out, ymap=ymap, verbose=verbose, plots=plots, rearrange=rearrange)
 
-  out <- estimateErrors(file=file.path(dirname,pedfile), keep.rep=keep.rep, y.marker=y.marker, x.marker=x.marker, neg_controls=neg_controls, plots=plots, verbose=verbose)
+  fluidigm2PLINK(file=file, out=out, map=map, verbose=verbose, plots=plots, rearrange=rearrange)
 
-  calculatePairwiseSimilarities(file=file.path(dirname,plinkfile), db=db, map=woymap, verbose=verbose)
+  out <- estimateErrors(file=file.path(dirname,pedfile), db=db, keep.rep=keep.rep, y.marker=y.marker, x.marker=x.marker, neg_controls=neg_controls, plots=plots, verbose=verbose)
+
+  if(newDB) db <- NA
+
+  calculatePairwiseSimilarities(file=path_plinkfile, db=db, verbose=verbose)
+
+  if(!is.na(db)) path_plinkfile <- paste0(path_plinkfile,"_oDB")
 
   getPairwiseSimilarityLoci(file=file.path(dirname,plinkfile), verbose=verbose)
 
-  similarityMatrix(file=paste0(file.path(dirname,plinkfile),"_oDB"),
+  similarityMatrix(file=file.path(dirname,plinkfile),
                    group=group,
                    verbose=verbose)
 
