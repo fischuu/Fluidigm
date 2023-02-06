@@ -11,9 +11,11 @@
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE){
+fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE){
   ### Input checks
   ##############################################################################
+  if(is.na(file)) stop("Please provide a csv file!")
+  if(is.na(map)) stop("Please provide a map file!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
