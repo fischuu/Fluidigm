@@ -4,15 +4,20 @@
 #'
 #' @param file Path to the ped input file
 #' @param keep.rep numeric, keep only this n-fold replicates, default n=2
-#' @param y.marker logical, Remove markers located on y-chromosome
+#' @param y.marker Y markers for sexing
+#' @param x.marker X markers for sexing
+#' @param sp.marker Markers used for species-identification
 #' @param plots logical, shall plots be created?
+#' @param neg_controls XXX
+#' @param allele_error Threshold for RERUN on Allele errors
+#' @param marker_dropout Threshold for RERUN on Marker dropout
 #' @param verbose Should the output be verbose, logical or numerical
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
 #' @export
 
-estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.marker=NA, x.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
+estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
                            female.Xtot=8, female.hetXtot=3, warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
 
   # Input checks
@@ -318,6 +323,81 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.m
     # lastly call all sex as "Uncertain" if Marker dropout > 25%
       summs$sex[summs$Marker_dropout > 25] <- "Uncertain"
 
+    # Process the species marker set sp.marker
+      # Remove y-chromosome based markers
+      if(sum(!is.na(sp.marker))>0 ){
+        ### Sex assignment
+        summs$noSPHetX1 <- NA
+        summs$noSPHetX2 <- NA
+        summs$noSPHetXtot <- NA
+        summs$noSPX1 <- NA
+        summs$noSPX2 <- NA
+        summs$noSPXtot <- NA
+
+        sp_marker_pos <- NULL
+        if(sum(is.numeric(sp.marker))>0 | sum(sp.marker=="X")>0){
+          sp_marker_pos <- which(is.element(map1$V1, sp.marker))
+        } else {
+          sp_marker_pos <- which(is.element(map1$V2, sp.marker))
+        }
+        remove_sp <- sort(c(sp_marker_pos*2+5, sp_marker_pos*2+6))
+
+        if(verbose>1){
+          cat("Base species-marker analysis on the following markers:\n")
+          for(i in 1:length(sp_marker_pos)){
+            cat(as.character(map1$V2)[sp_marker_pos[i]],"\n")
+          }
+          cat("\nConsider the following columns in ped-file:\n")
+          cat(remove_sp,"\n")
+        }
+
+        for(i in 1:length(unique(nam))){
+          # get all genotypes for individual i
+          ind <- unique(nam)[i]
+          indgen <- ped[ped$V2==ind,]
+          genSP <- indgen[,remove_sp]
+          genSP[] <- lapply(genSP, factor) 				# 3 new lines - change all variables in genX to factor
+          levs <- unique(unlist(lapply(genSP,levels)))		# Get vector of all levels that appear in the data.frame
+          genSP <- data.frame(lapply(genSP,factor,levels=levs))	# Set these as the levels for each column
+
+          # count number of of heterozygote genotypes
+          SPgeno1 <- 0
+          SPgeno1[genSP[1,1] != genSP[1,2]]  <- SPgeno1+1
+          SPgeno1[genSP[1,3] != genSP[1,4]]  <- SPgeno1+1
+          SPgeno1[genSP[1,5] != genSP[1,6]]  <- SPgeno1+1
+          SPgeno1[genSP[1,7] != genSP[1,8]]  <- SPgeno1+1
+          SPgeno1[genSP[1,9] != genSP[1,10]]  <- SPgeno1+1
+          SPgeno1[genSP[1,11] != genSP[1,12]]  <- SPgeno1+1
+
+          if(replicates){
+            SPgeno2 <- 0
+          } else {
+            SPgeno2 <- NA
+          }
+          SPgeno2[genSP[2,1] != genSP[2,2]]  <- SPgeno2+1
+          SPgeno2[genSP[2,3] != genSP[2,4]]  <- SPgeno2+1
+          SPgeno2[genSP[2,5] != genSP[2,6]]  <- SPgeno2+1
+          SPgeno2[genSP[2,7] != genSP[2,8]]  <- SPgeno2+1
+          SPgeno2[genSP[2,9] != genSP[2,10]]  <- SPgeno2+1
+          SPgeno2[genSP[2,11] != genSP[2,12]]  <- SPgeno2+1
+
+          # put these in the right place in table "summs"
+          summs$noSPHetX1[summs$Ind==ind] <- SPgeno1
+          summs$noSPHetX2[summs$Ind==ind] <- SPgeno2
+          summs$noSPHetXtot[summs$Ind==ind] <- sum(SPgeno1,SPgeno2, na.rm=TRUE)
+
+          # count total number of working SP-markers
+          SPtgeno1 <- sum(genSP[1,]!=0, na.rm=TRUE)/2
+          SPtgeno2 <- sum(genSP[2,]!=0, na.rm=TRUE)/2
+          if(!replicates) SPtgeno2 <- NA
+
+          # put these in the right place in table "summs"
+          summs$noSPX1[summs$Ind==ind] <- SPtgeno1
+          summs$noSPX2[summs$Ind==ind] <- SPtgeno2
+          summs$noSPXtot[summs$Ind==ind] <- sum(SPtgeno1,SPtgeno2, na.rm=TRUE)
+        }
+
+      }
     ### Export table with summary data for each sample
     ###################################################################
       write.table(summs, file = file.path(dirname,paste0(basename,"_summary_individuals.csv")), quote=FALSE, sep=";", row.names=FALSE, col.names=TRUE)

@@ -5,7 +5,7 @@
 \title{Turn Fluidigm Output Into PLINK Format}
 \usage{
 fluidigm2PLINK(
-  file,
+  file = NA,
   out = NA,
   map = NA,
   plots = TRUE,

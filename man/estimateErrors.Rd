@@ -11,6 +11,7 @@ estimateErrors(
   keep.rep = 1,
   y.marker = NA,
   x.marker = NA,
+  sp.marker = NA,
   plots = TRUE,
   neg_controls = NA,
   allele_error = 5,
@@ -31,9 +32,19 @@ estimateErrors(
 
 \item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
 
-\item{y.marker}{logical, Remove markers located on y-chromosome}
+\item{y.marker}{Y markers for sexing}
+
+\item{x.marker}{X markers for sexing}
+
+\item{sp.marker}{Markers used for species-identification}
 
 \item{plots}{logical, shall plots be created?}
+
+\item{neg_controls}{XXX}
+
+\item{allele_error}{Threshold for RERUN on Allele errors}
+
+\item{marker_dropout}{Threshold for RERUN on Marker dropout}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 }

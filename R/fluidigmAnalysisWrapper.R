@@ -18,11 +18,10 @@
 
 fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE, map=NA, keep.rep=1, neg_controls=NA, y.marker=NA, x.marker=NA, plots=TRUE, rearrange=TRUE, group=NA, verbose=TRUE){
 
-# Input checks and setting verbosity
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
+
   if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
 
-# File definitions
   filename <- basename(file)
   dirname <- dirname(file)
   pedfile <- gsub("csv$","ped",filename)
@@ -30,7 +29,6 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
   path_plinkfile <- file.path(dirname,plinkfile)
   if(dirname==".") path_plinkfile <- gsub("./", "", path_plinkfile)
 
-# Logical, shall a new database file be created or an old one used
   if(file.exists(file.path(dirname, db))){
     newDB <- FALSE
   } else {
