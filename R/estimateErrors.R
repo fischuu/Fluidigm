@@ -17,12 +17,28 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA, allele_error=5, marker_dropout=15, no_marker=50, male.y=3, male.hetX=0, female.y=0,
-                           female.Xtot=8, female.hetXtot=3, warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
+estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
+                           y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA,
+                           allele_error=5, marker_dropout=15, no_marker=50,
+                           male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
+                           warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
 
   # Input checks
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
     if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
+
+  # Welcome screen
+  if(verbose>0){
+    cat("Sex determination settings:\n")
+    cat("-------------------------------\n")
+    cat("MALE      : Call as MALE, if number of Y total (noYtot) >=", male.y,"(male.y - option) AND noHetXtot <=", male.hetX,"(male.hetX - option)\n")
+    cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND number of total X (noXtot)is >= ",female.Xtot,"(female.Xtot - option)\n")
+    cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND noHetXtot >= ",female.hetXtot, "(female.hetXtot - option)\n")
+    cat("WARNING   : Call as WARNING, if if number of Y total (noYtot) >= ",warning.noYtot,"(warning.noYtot - option) and noHetXtot >= ",warning.noHetXtot,"(warning.noHetXtot - option\n")
+    cat("UNCERTAIN : Call as Uncertain, if marker dropout > 25% \n")
+    cat("Unhandled : All other cases will be marked as unhandled (this case should not happen...)\n")
+  }
+
 
   # Import sample genotypes:
     dirname <- dirname(file)
@@ -310,8 +326,8 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1, y.m
     }
 
     # Add column for assigned sex, and fill in using criteria below
-      summs$sex <- as.factor("Uncertain")
-      levels(summs$sex) <- c("Uncertain","Female","Male","WARNING")
+      summs$sex <- as.factor("Unhandled")
+      levels(summs$sex) <- c("Uncertain", "Unhandled","Female","Male","WARNING")
     # Call as Male if number Ytot > 2 AND number HetXtot < 1
       summs$sex[summs$noYtot >= male.y & summs$noHetXtot <= male.hetX] <- "Male"
     # Call as Female if number Ytot == 0 AND noXtot > 8
