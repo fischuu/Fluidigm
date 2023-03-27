@@ -10,6 +10,7 @@ fluidigm2PLINK(
   map = NA,
   plots = TRUE,
   rearrange = TRUE,
+  missing.geno = "0 0",
   verbose = TRUE
 )
 }
@@ -25,6 +26,8 @@ fluidigm2PLINK(
 \item{verbose}{Should the output be verbose, logical or numerical}
 
 \item{plot}{Logical, plot additional figures for conversion}
+
+\item{missing}{Character, how shall missing values be coded}
 }
 \value{
 A ped/map file pair and optional diagnostic plots

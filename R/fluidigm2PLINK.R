@@ -7,11 +7,12 @@
 #' @param map Filepath to PlateD_withY.map file
 #' @param plot Logical, plot additional figures for conversion
 #' @param rearrange Logical, rearrange the ped/map output in order of ymap
+#' @param missing Character, how shall missing values be coded
 #' @param verbose Should the output be verbose, logical or numerical
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE){
+fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", verbose=TRUE){
   ### Input checks
   ##############################################################################
   if(is.na(file)) stop("Please provide a csv file!")
@@ -28,11 +29,12 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
   # Read the fluidigm data into a data table
     tmp <- readLines(file)
     skip <- which(tmp=="SNP Converted Calls")
-    dd1 <- data.table::fread(file, skip=skip +1)
-  # Turn the data table into a data fram
+    dd1 <- data.table::fread(file, skip=skip +1, header = TRUE)
+  # Turn the data table into a data frame
     dd <- as.data.frame(unclass(dd1))
+    dd$V2 <- as.factor(dd$V2)
   # Add new level to V2
-    levels(dd$V2)<-c(levels(dd$V2),"Chipblank")
+    levels(dd$V2) <- c(levels(dd$V2),"Chipblank")
   # Adjust the names for NTC
     dd$V2[dd$V2=="NTC"] <- "Chipblank"
 
@@ -40,23 +42,37 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
   ##############################################################################
 
   # snpids are in the first row, but first two columns are reserved for other input
-    snpIDs <- dd[1,c(-1,-2)]
+    snpIDs <- colnames(dd)[-c(1:2)]
   # Create the map file
     ddmap <- data.frame(matrix(0, nrow = length(snpIDs), ncol = 4))
   # Add the SNP-IDs to the map
-    ddmap$X2 <- t(snpIDs)
+    ddmap$X2 <- snpIDs
     newOrder <- 1:nrow(ddmap)
 
   if(!is.na(map)){
     # Check that markers are in correct order
       truemap <- read.table(map, sep = "\t", col.names= c("X1", "MAP", "X3", "X4"), colClasses = "character")
-      comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
+      #comp <- as.factor(c(truemap$MAP)) == as.factor(c(ddmap$X2))
+      comp <- truemap$MAP == ddmap$X2
 
-      if(sum(cumprod(comp)) < nrow(ddmap)){
+      if(sum(comp) < nrow(truemap)){
+        if(sum(is.element(truemap$MAP,ddmap$X2))<nrow(truemap)){
+          if(verbose){
+            cat("Mismatching entries between MAP entries:\n-----------------------------------------------------------------\n")
+            printThis <- cbind(ddmap$X2[!comp], truemap$MAP[!comp])
+            colnames(printThis) <- c("file-input", "map-input")
+            print(printThis)
+            stop("ERROR: You need to fix first the marker names before you can proceed!")
+          }
+        }
         if(rearrange){
           if(verbose>1) print("Markers are not in the same order as in the provided map file, rearrange the output!")
           for(i in 1:nrow(truemap)){
-            newOrder[i] <- which(truemap$MAP[i] == ddmap[,2])
+            newOrderEntry <- which(truemap$MAP[i] == ddmap[,2])
+            if(length(newOrderEntry)==0){
+              if(verbose) stop("Entry ", truemap$MAP[i]," from map-file cannot be found in ", file, "\n")
+            }
+            newOrder[i] <- newOrderEntry
           }
           ddmap <- ddmap[newOrder,]
         } else {
@@ -68,6 +84,7 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
   } else {
      if(verbose>1) cat("No map file provided, create one based on marker IDs from csv file\n")
   }
+
   # Populate the new map file with information from the provided map file
     for(i in 1:nrow(ddmap)){
       if(truemap[i,1]!=0) ddmap[i,1] <- truemap[i,1]
@@ -76,6 +93,9 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
     }
   # Export the .map file
     map.filename <- gsub(".csv", ".map", filename)
+    if(verbose>1){
+      cat("Export", nrow(ddmap), "markers into the new created map file:",map.filename,"\n")
+    }
     write.table(ddmap, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
   ### Create the PED file
@@ -85,7 +105,7 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
     if(rearrange){
       dd <- dd[,c(1,2,newOrder+2)]
     }
-    ddped1 <- dd[-1,]
+    ddped1 <- dd
     number_samples <- nrow(ddped1)
     if(verbose>1) cat("Number of samples in data:",number_samples, "\n")
     number_markers <- ncol(ddped1)-2
@@ -120,13 +140,13 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
       }
     }
 
-  # to replace missing genotypes add "0 0" instead of Invalid, NTC and No Call
+  # to replace missing genotypes add "missing.geno" instead of Invalid, NTC and No Call
     for(k in 7:ncol(ddped2)){
-      levels(ddped2[,k]) <- c(levels(ddped2[,k]),"0 0")
+      levels(ddped2[,k]) <- c(levels(ddped2[,k]),missing.geno)
     }
-    ddped2[ddped2 == "Invalid"] <- "0 0"
-    ddped2[ddped2 == "NTC"] <- "0 0"
-    ddped2[ddped2 == "No Call"] <- "0 0"
+    ddped2[ddped2 == "Invalid"] <- missing.geno
+    ddped2[ddped2 == "NTC"] <- missing.geno
+    ddped2[ddped2 == "No Call"] <- missing.geno
 
   # export ped file
     ped.filename <- gsub(".csv", ".ped", filename)
@@ -134,9 +154,9 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
 
   ### Create summary statistics
   # call rate markers
-    genomark <- table(ddped2[,7]!="0 0")["TRUE"]
+    genomark <- table(ddped2[,7]!=missing.geno)["TRUE"]
     for(l in 8:ncol(ddped2)){
-      b <- table(ddped2[,l]!="0 0")["TRUE"]
+      b <- table(ddped2[,l]!=missing.geno)["TRUE"]
       genomark <- rbind(genomark,b)
     }
     genomark[is.na(genomark)]<- 0
@@ -153,9 +173,9 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
     }
 
   # genotyping success samples
-    genosamp <- table(ddped2[1,c(7:ncol(ddped2))]!="0 0")["TRUE"]
+    genosamp <- table(ddped2[1,c(7:ncol(ddped2))]!=missing.geno)["TRUE"]
     for(m in 2:nrow(ddped2)){
-      c <- table(ddped2[m,c(7:ncol(ddped2))]!="0 0")["TRUE"]
+      c <- table(ddped2[m,c(7:ncol(ddped2))]!=missing.geno)["TRUE"]
       genosamp <- rbind(genosamp,c)
     }
     genosamp[is.na(genosamp)]<- 0
