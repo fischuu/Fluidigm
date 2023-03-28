@@ -8,17 +8,23 @@
 #' @param plot Logical, plot additional figures for conversion
 #' @param rearrange Logical, rearrange the ped/map output in order of ymap
 #' @param missing Character, how shall missing values be coded
+#' @param fixNames logical, remove whitespaces from sample names automatically
 #' @param verbose Should the output be verbose, logical or numerical
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", verbose=TRUE){
+fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, verbose=TRUE){
   ### Input checks
   ##############################################################################
   if(is.na(file)) stop("Please provide a csv file!")
   if(is.na(map)) stop("Please provide a map file!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
+
+  if(verbose){
+    if(length(grep(" ", file))>0) warning("There are whitespaces in your input file, this will most likely crash your plink system call!\n
+                                          My suggestion, change the whitespaces with underscores ('_')  and rerun.")
+  }
 
   ### Import the fluidigm data from csv file
   ##############################################################################
@@ -147,6 +153,16 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
     ddped2[ddped2 == "Invalid"] <- missing.geno
     ddped2[ddped2 == "NTC"] <- missing.geno
     ddped2[ddped2 == "No Call"] <- missing.geno
+
+  # Fix the sample names
+    if(fixNames){
+      ddped2$V2 <- sub(" ", "_", ddped2$V2)
+    } else {
+      if(verbose){
+        if(length(grep(" ", ddped2$V2))>0) warning("There are whitespaces in the sample names, most likely the downstream analysis will fail!\n
+                                                   Fix it manually and rerun this function or set 'fixNames=TRUE'")
+      }
+    }
 
   # export ped file
     ped.filename <- gsub(".csv", ".ped", filename)

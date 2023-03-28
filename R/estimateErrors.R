@@ -11,6 +11,7 @@
 #' @param neg_controls XXX
 #' @param allele_error Threshold for RERUN on Allele errors
 #' @param marker_dropout Threshold for RERUN on Marker dropout
+#' @param sexing Logical, if sexing should be performed
 #' @param verbose Should the output be verbose, logical or numerical
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
@@ -21,22 +22,24 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
                            y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA,
                            allele_error=5, marker_dropout=15, no_marker=50,
                            male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
-                           warning.noYtot=2, warning.noHetXtot=3, verbose=TRUE){
+                           warning.noYtot=2, warning.noHetXtot=3, sexing=TRUE, verbose=TRUE){
 
   # Input checks
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
-    if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
+    if(sexing) if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
 
   # Welcome screen
-  if(verbose>0){
-    cat("Sex determination settings:\n")
-    cat("-------------------------------\n")
-    cat("MALE      : Call as MALE, if number of Y total (noYtot) >=", male.y,"(male.y - option) AND noHetXtot <=", male.hetX,"(male.hetX - option)\n")
-    cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND number of total X (noXtot)is >= ",female.Xtot,"(female.Xtot - option)\n")
-    cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND noHetXtot >= ",female.hetXtot, "(female.hetXtot - option)\n")
-    cat("WARNING   : Call as WARNING, if if number of Y total (noYtot) >= ",warning.noYtot,"(warning.noYtot - option) and noHetXtot >= ",warning.noHetXtot,"(warning.noHetXtot - option\n")
-    cat("UNCERTAIN : Call as Uncertain, if marker dropout > 25% \n")
-    cat("Unhandled : All other cases will be marked as unhandled (this case should not happen...)\n")
+  if(sexing){
+    if(verbose>0){
+      cat("Sex determination settings:\n")
+      cat("-------------------------------\n")
+      cat("MALE      : Call as MALE, if number of Y total (noYtot) >=", male.y,"(male.y - option) AND noHetXtot <=", male.hetX,"(male.hetX - option)\n")
+      cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND number of total X (noXtot)is >= ",female.Xtot,"(female.Xtot - option)\n")
+      cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND noHetXtot >= ",female.hetXtot, "(female.hetXtot - option)\n")
+      cat("WARNING   : Call as WARNING, if if number of Y total (noYtot) >= ",warning.noYtot,"(warning.noYtot - option) and noHetXtot >= ",warning.noHetXtot,"(warning.noHetXtot - option\n")
+      cat("UNCERTAIN : Call as Uncertain, if marker dropout > 25% \n")
+      cat("Unhandled : All other cases will be marked as unhandled (this case should not happen...)\n")
+    }
   }
 
 
@@ -87,6 +90,10 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     remove_y <- c(marker_pos*2+5, marker_pos*2+6)
     map1_wo_y <- map1[-marker_pos,]
     ped_wo_y <- ped[,-remove_y]
+  } else {
+  # If nothing should be removed, just copy the original files to process them further
+    map1_wo_y <- map1
+    ped_wo_y <- ped
   }
 
   ### Start main analyses for summary output
@@ -219,6 +226,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     }
 
   ### Sex assignment
+  if(sexing){
     summs$noHetX1 <- NA
     summs$noHetX2 <- NA
     summs$noHetXtot <- NA
@@ -339,7 +347,8 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     # lastly call all sex as "Uncertain" if Marker dropout > 25%
       summs$sex[summs$Marker_dropout > 25] <- "Uncertain"
 
-    # Process the species marker set sp.marker
+
+  # Process the species marker set sp.marker
       # Remove y-chromosome based markers
       if(sum(!is.na(sp.marker))>0 ){
         ### Sex assignment
@@ -414,11 +423,14 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
         }
 
       }
+  }
+
     ### Export table with summary data for each sample
     ###################################################################
       write.table(summs, file = file.path(dirname,paste0(basename,"_summary_individuals.csv")), quote=FALSE, sep=";", row.names=FALSE, col.names=TRUE)
       summsRE <- summs[summs$categ=="RERUN",]
       write.table(summsRE$Ind, file = file.path(dirname,paste0(basename,"_samples_to_RERUN.txt")), quote=FALSE, sep=";", row.names=FALSE, col.names=FALSE)
+
 
     ### FINALY Create consensus PED for all "GOOD" samples AND export #######################################################
     # Ped file specifics:
@@ -496,10 +508,12 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
         GoodPed[j,1] <- j
       # add sex info (from summs)
         GoodPed[j,5] <- 0
-        if(summs$sex[summs$Ind==Gind]=="Male")
-          GoodPed[j,5] <- 1
-        if(summs$sex[summs$Ind==Gind]=="Female")
-          GoodPed[j,5] <- 2
+        if(sexing){
+          if(summs$sex[summs$Ind==Gind]=="Male")
+            GoodPed[j,5] <- 1
+          if(summs$sex[summs$Ind==Gind]=="Female")
+            GoodPed[j,5] <- 2
+        }
       }
 
     # export ped file

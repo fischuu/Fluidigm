@@ -9,6 +9,7 @@ calculatePairwiseSimilarities(
   db = NA,
   map = NA,
   out = NA,
+  sexing = TRUE,
   verbose = TRUE
 )
 }

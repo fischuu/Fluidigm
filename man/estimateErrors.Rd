@@ -24,6 +24,7 @@ estimateErrors(
   female.hetXtot = 3,
   warning.noYtot = 2,
   warning.noHetXtot = 3,
+  sexing = TRUE,
   verbose = TRUE
 )
 }
@@ -45,6 +46,8 @@ estimateErrors(
 \item{allele_error}{Threshold for RERUN on Allele errors}
 
 \item{marker_dropout}{Threshold for RERUN on Marker dropout}
+
+\item{sexing}{Logical, if sexing should be performed}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 }

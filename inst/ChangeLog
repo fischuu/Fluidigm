@@ -1,0 +1,13 @@
+################################################################################
+#####                                                                      #####
+#####                         CHANGELOG                                    #####
+#####                                                                      #####
+################################################################################
+
+0.1.*: UPDATES
+--------------------------------------------------------------------------------
+* 45: Added sexing option tocalculatePairwiseSimilarities() function  (=run PLINK with --allow-no-sex option)
+* 44: Adjusted the fluidigmAnalysisWrapper function so that it works again
+* 43: Added more input checks to fluidigm2PLINK() function
+* 42: Added option sexing=TRUE to estimateErrors() function
+* 41: Added option fixNames=TRUE to fluidigm2PLINK() function

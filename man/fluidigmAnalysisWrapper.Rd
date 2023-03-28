@@ -14,9 +14,22 @@ fluidigmAnalysisWrapper(
   neg_controls = NA,
   y.marker = NA,
   x.marker = NA,
+  sp.marker = NA,
   plots = TRUE,
+  allele_error = 5,
+  marker_dropout = 15,
+  no_marker = 50,
+  male.y = 3,
+  male.hetX = 0,
+  female.y = 0,
+  female.Xtot = 8,
+  female.hetXtot = 3,
+  warning.noYtot = 2,
+  warning.noHetXtot = 3,
   rearrange = TRUE,
   group = NA,
+  fixNames = TRUE,
+  sexing = TRUE,
   verbose = TRUE
 )
 }
@@ -32,6 +45,10 @@ fluidigmAnalysisWrapper(
 \item{y.marker}{logical, Remove markers located on y-chromosome}
 
 \item{plots}{logical, shall plots be created?}
+
+\item{fixNames}{logical, remove whitespaces from sample names automatically}
+
+\item{sexing}{Logical, if sexing should be performed}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 

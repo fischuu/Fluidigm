@@ -11,6 +11,7 @@ fluidigm2PLINK(
   plots = TRUE,
   rearrange = TRUE,
   missing.geno = "0 0",
+  fixNames = TRUE,
   verbose = TRUE
 )
 }
@@ -22,6 +23,8 @@ fluidigm2PLINK(
 \item{map}{Filepath to PlateD_withY.map file}
 
 \item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+
+\item{fixNames}{logical, remove whitespaces from sample names automatically}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 

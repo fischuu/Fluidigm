@@ -1,6 +1,6 @@
 Package: Fluidigm
 Title: Handling Fluidigm Data
-Version: 0.1.40
+Version: 0.1.45
 Authors@R: 
     person("Daniel", "Fischer", , "Daniel.Fischer@luke.fi", role = c("aut", "cre"),
            comment = c(ORCID = "Y0000-0002-7513-683X"))

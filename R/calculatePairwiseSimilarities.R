@@ -12,7 +12,7 @@
 #'         summs, a matrix with summary statistics
 #' @export
 
-calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, verbose=TRUE){
+calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE){
 
    ### Input check
    ##############################################################################
@@ -44,7 +44,11 @@ calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, verbose=T
 
 
    # Calculate pairwise similarities for all samples (and database individuals):
-     plinkCommand <- paste0("plink --noweb --file ",out," --cluster --matrix --out ", out)
+     if(sexing){
+       plinkCommand <- paste0("plink --noweb --file ",out," --cluster --matrix --out ", out)
+     } else {
+       plinkCommand <- paste0("plink --noweb --file ",out," --cluster --matrix --allow-no-sex --out ", out)
+     }
      if(verbose>1){
        cat("Run the following PLINK command:\n", plinkCommand)
      }
