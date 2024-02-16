@@ -25,11 +25,16 @@ estimateErrors(
   warning.noYtot = 2,
   warning.noHetXtot = 3,
   sexing = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  verbosity = 1
 )
 }
 \arguments{
 \item{file}{Path to the ped input file}
+
+\item{db}{Name of the used database}
+
+\item{appendSamplesToDB}{Logical, shoud new samples be added to database}
 
 \item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
 
@@ -41,15 +46,36 @@ estimateErrors(
 
 \item{plots}{logical, shall plots be created?}
 
-\item{neg_controls}{XXX}
+\item{neg_controls}{Names of negative controls}
 
 \item{allele_error}{Threshold for RERUN on Allele errors}
 
 \item{marker_dropout}{Threshold for RERUN on Marker dropout}
 
+\item{no_marker}{Number of markers}
+
+\item{male.y}{Threshold for sexing, male y-chromosome markers}
+
+\item{male.hetX}{Threshold for sexing, heterozygote x-chr markers}
+
+\item{female.y}{Threshold for sexing, female y-chromosome markers}
+
+\item{female.Xtot}{Threshold for sexing, total female x-chr markers}
+
+\item{female.hetXtot}{Threshold for sexing, heterozygote x-chr markers}
+
+\item{warning.noYtot}{Threshold for sexing, when should warning be triggered}
+
+\item{warning.noHetXtot}{Threshold for sexing, when should warning be triggered}
+
 \item{sexing}{Logical, if sexing should be performed}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
+
+\item{verbosity}{Level of verbosity, set to higher number for more details
+
+#' @details
+Additional details...}
 }
 \value{
 A list containing the following elements:
@@ -58,4 +84,9 @@ summs, a matrix with summary statistics
 }
 \description{
 This function processes the PLINK ped files
+}
+\examples{
+\dontrun{
+  estimateErrors()
+}
 }

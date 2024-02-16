@@ -6,6 +6,12 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 51: Added manual skeletons for Details and Examples
+* 50: Added the vignette skeleton
+* 49: Added co-authors and contributers
+* 48: Missing function parameters added to the documentation
+* 47: Adding verbosity option for more detailed function feedback (split from verbose logical/numerical mix)
+* 46: Placed importFrom under usethis control ( usethis::use_import_from("grDevices", "png") )
 * 45: Added sexing option tocalculatePairwiseSimilarities() function  (=run PLINK with --allow-no-sex option)
 * 44: Adjusted the fluidigmAnalysisWrapper function so that it works again
 * 43: Added more input checks to fluidigm2PLINK() function

@@ -1,30 +1,53 @@
-#' Process the PLINK ped files
+#' @title Process the PLINK ped files
 #'
+#' @description
 #' This function processes the PLINK ped files
 #'
 #' @param file Path to the ped input file
+#' @param db Name of the used database
+#' @param appendSamplesToDB Logical, shoud new samples be added to database
 #' @param keep.rep numeric, keep only this n-fold replicates, default n=2
 #' @param y.marker Y markers for sexing
 #' @param x.marker X markers for sexing
 #' @param sp.marker Markers used for species-identification
 #' @param plots logical, shall plots be created?
-#' @param neg_controls XXX
+#' @param neg_controls Names of negative controls
 #' @param allele_error Threshold for RERUN on Allele errors
 #' @param marker_dropout Threshold for RERUN on Marker dropout
+#' @param no_marker Number of markers
+#' @param male.y Threshold for sexing, male y-chromosome markers
+#' @param male.hetX Threshold for sexing, heterozygote x-chr markers
+#' @param female.y Threshold for sexing, female y-chromosome markers
+#' @param female.Xtot Threshold for sexing, total female x-chr markers
+#' @param female.hetXtot Threshold for sexing, heterozygote x-chr markers
+#' @param warning.noYtot  Threshold for sexing, when should warning be triggered
+#' @param warning.noHetXtot  Threshold for sexing, when should warning be triggered
 #' @param sexing Logical, if sexing should be performed
 #' @param verbose Should the output be verbose, logical or numerical
+#' @param verbosity Level of verbosity, set to higher number for more details
+#'
+#' #' @details
+#' Additional details...
+#'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
+#'
+#' @examples
+#' \dontrun{
+#'   estimateErrors()
+#' }
 #' @export
 
 estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
                            y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA,
                            allele_error=5, marker_dropout=15, no_marker=50,
                            male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
-                           warning.noYtot=2, warning.noHetXtot=3, sexing=TRUE, verbose=TRUE){
+                           warning.noYtot=2, warning.noHetXtot=3, sexing=TRUE, verbose=TRUE, verbosity=1){
 
   # Input checks
+    if(!verbose & verbosity > 0) verbosity <- 0
+    verbose <- verbosity
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
     if(sexing) if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
 

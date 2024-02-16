@@ -12,7 +12,8 @@ fluidigm2PLINK(
   rearrange = TRUE,
   missing.geno = "0 0",
   fixNames = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  verbosity = 1
 )
 }
 \arguments{
@@ -22,19 +23,30 @@ fluidigm2PLINK(
 
 \item{map}{Filepath to PlateD_withY.map file}
 
+\item{plots}{Logical, plot additional figures for conversion}
+
 \item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+
+\item{missing.geno}{Character, how shall missing values be coded}
 
 \item{fixNames}{logical, remove whitespaces from sample names automatically}
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 
-\item{plot}{Logical, plot additional figures for conversion}
+\item{verbosity}{Level of verbosity, set to higher number for more details
 
-\item{missing}{Character, how shall missing values be coded}
+#' @details
+Additional details...}
 }
 \value{
 A ped/map file pair and optional diagnostic plots
 }
 \description{
 This function loads a fluidigm output and turns it into a PLINK format
+}
+\examples{
+\dontrun{
+  fluidigm2PLINK()
+}
+
 }

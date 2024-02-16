@@ -1,21 +1,36 @@
-#' Run plink to Calculate Pairwise Similarities
+#' @title Run plink to Calculate Pairwise Similarities
 #'
+#' @description
 #' This function is a wrapper to plink to calculate pairwise similarities
 #'
 #' @param file Path to the filtered ped/map file pair (without ped/map file extension)
 #' @param db Path to an existing genotype database
 #' @param map Filepath to PlateDnoY.map file
-#' @param out Path to the output, can be emptu
-#' @param verbose Should the output be verbose, logical or numerical
+#' @param out Path to the output, can be empty
+#' @param sexing Logical, should the function try to perform sexing
+#' @param verbose Should the output be verbose, logical
+#' @param verbosity Level of verbosity, set to higher number for more details
+#'
+#' @details
+#' Additional details...
+#'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
+#'
+#' @examples
+#' \dontrun{
+#'   calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1)
+#' }
+#'
 #' @export
 
-calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE){
+calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1){
 
    ### Input check
    ##############################################################################
+    if(!verbose & verbosity > 0) verbosity <- 0
+    verbose <- verbosity
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
     ifelse(verbose>1, intern.param <- FALSE, intern.param <- TRUE)
     if(is.na(out)) out <- paste0(file,"_oDB")

@@ -1,5 +1,6 @@
-#' Run the fluidigm analysis script together
+#' @title Run the fluidigm analysis script together
 #'
+#' @description
 #' This function is a wrapper for the whole analysis
 #'
 #' @param file Path to the input file
@@ -8,14 +9,27 @@
 #' @param ped.file Path to the pairs input file (only if name differs)
 #' @param group Sample identified for sample-wise statistics
 #' @param plots logical, shall plots be created?
-#' @param verbose Should the output be verbose, logical or numerical
+#' @param similarity  Threshold defining the level of similarity
+#' @param verbose Should the output be verbose, logical
+#' @param verbosity Level of verbosity, set to higher number for more details
+#'
+#' #' @details
+#' Additional details...
+#'
+#' @examples
+#' \dontrun{
+#'   similarityMatrix()
+#' }
+#'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
 #' @export
 
-similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, similarity=0.85, verbose=TRUE){
+similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, similarity=0.85, verbose=TRUE, verbosity=1){
 
+  if(!verbose & verbosity > 0) verbosity <- 0
+  verbose <- verbosity
   if(is.na(file)) stop("ERROR: No input file provided")
   if(is.na(mibs.file)) mibs.file <- paste0(file,".mibs")
   if(is.na(pairs.file)) pairs.file <- paste0(file,".pairs")

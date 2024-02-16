@@ -12,7 +12,8 @@ similarityMatrix(
   group = NA,
   plots = TRUE,
   similarity = 0.85,
-  verbose = TRUE
+  verbose = TRUE,
+  verbosity = 1
 )
 }
 \arguments{
@@ -28,7 +29,14 @@ similarityMatrix(
 
 \item{plots}{logical, shall plots be created?}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{similarity}{Threshold defining the level of similarity}
+
+\item{verbose}{Should the output be verbose, logical}
+
+\item{verbosity}{Level of verbosity, set to higher number for more details
+
+#' @details
+Additional details...}
 }
 \value{
 A list containing the following elements:
@@ -37,4 +45,10 @@ summs, a matrix with summary statistics
 }
 \description{
 This function is a wrapper for the whole analysis
+}
+\examples{
+\dontrun{
+  similarityMatrix()
+}
+
 }

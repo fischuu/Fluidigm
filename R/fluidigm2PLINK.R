@@ -1,21 +1,34 @@
-#' Turn Fluidigm Output Into PLINK Format
+#' @title Turn Fluidigm Output Into PLINK Format
 #'
+#' @description
 #' This function loads a fluidigm output and turns it into a PLINK format
 #'
 #' @param file Path to the input file
 #' @param out Out file name, keep empty to keep the original basename
 #' @param map Filepath to PlateD_withY.map file
-#' @param plot Logical, plot additional figures for conversion
+#' @param plots Logical, plot additional figures for conversion
 #' @param rearrange Logical, rearrange the ped/map output in order of ymap
-#' @param missing Character, how shall missing values be coded
+#' @param missing.geno Character, how shall missing values be coded
 #' @param fixNames logical, remove whitespaces from sample names automatically
 #' @param verbose Should the output be verbose, logical or numerical
+#' @param verbosity Level of verbosity, set to higher number for more details
+#'
+#' #' @details
+#' Additional details...
+#'
+#' @examples
+#' \dontrun{
+#'   fluidigm2PLINK()
+#' }
+#'
 #' @return A ped/map file pair and optional diagnostic plots
 #' @export
 
-fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, verbose=TRUE){
+fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, verbose=TRUE, verbosity=1){
   ### Input checks
   ##############################################################################
+  if(!verbose & verbosity > 0) verbosity <- 0
+  verbose <- verbosity
   if(is.na(file)) stop("Please provide a csv file!")
   if(is.na(map)) stop("Please provide a map file!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")

@@ -30,7 +30,8 @@ fluidigmAnalysisWrapper(
   group = NA,
   fixNames = TRUE,
   sexing = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  verbosity = 1
 )
 }
 \arguments{
@@ -40,11 +41,45 @@ fluidigmAnalysisWrapper(
 
 \item{db}{Filepath to database file}
 
+\item{appendSamplesToDB}{Logical, shoud new samples be added to database}
+
+\item{map}{Filepath to PlateDnoY.map file}
+
 \item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
 
-\item{y.marker}{logical, Remove markers located on y-chromosome}
+\item{neg_controls}{Names of negative controls}
+
+\item{y.marker}{Y markers for sexing}
+
+\item{x.marker}{X markers for sexing}
+
+\item{sp.marker}{Markers used for species-identification}
 
 \item{plots}{logical, shall plots be created?}
+
+\item{allele_error}{Threshold for RERUN on Allele errors}
+
+\item{marker_dropout}{Threshold for RERUN on Marker dropout}
+
+\item{no_marker}{Number of markers}
+
+\item{male.y}{Threshold for sexing, male y-chromosome markers}
+
+\item{male.hetX}{Threshold for sexing, heterozygote x-chr markers}
+
+\item{female.y}{Threshold for sexing, female y-chromosome markers}
+
+\item{female.Xtot}{Threshold for sexing, total female x-chr markers}
+
+\item{female.hetXtot}{Threshold for sexing, heterozygote x-chr markers}
+
+\item{warning.noYtot}{Threshold for sexing, when should warning be triggered}
+
+\item{warning.noHetXtot}{Threshold for sexing, when should warning be triggered}
+
+\item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+
+\item{group}{Sample identified for sample-wise statistics}
 
 \item{fixNames}{logical, remove whitespaces from sample names automatically}
 
@@ -52,7 +87,10 @@ fluidigmAnalysisWrapper(
 
 \item{verbose}{Should the output be verbose, logical or numerical}
 
-\item{ymap}{Filepath to PlateD_withoutY.map file}
+\item{verbosity}{Level of verbosity, set to higher number for more details
+
+#' @details
+Additional details...}
 }
 \value{
 A list containing the following elements:
@@ -61,4 +99,10 @@ summs, a matrix with summary statistics
 }
 \description{
 This function is a wrapper for the whole analysis
+}
+\examples{
+\dontrun{
+  fluidigmAnalysisWrapper()
+}
+
 }

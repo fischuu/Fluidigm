@@ -10,7 +10,8 @@ calculatePairwiseSimilarities(
   map = NA,
   out = NA,
   sexing = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  verbosity = 1
 )
 }
 \arguments{
@@ -20,9 +21,13 @@ calculatePairwiseSimilarities(
 
 \item{map}{Filepath to PlateDnoY.map file}
 
-\item{out}{Path to the output, can be emptu}
+\item{out}{Path to the output, can be empty}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{sexing}{Logical, should the function try to perform sexing}
+
+\item{verbose}{Should the output be verbose, logical}
+
+\item{verbosity}{Level of verbosity, set to higher number for more details}
 }
 \value{
 A list containing the following elements:
@@ -31,4 +36,13 @@ summs, a matrix with summary statistics
 }
 \description{
 This function is a wrapper to plink to calculate pairwise similarities
+}
+\details{
+Additional details...
+}
+\examples{
+\dontrun{
+  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1)
+}
+
 }

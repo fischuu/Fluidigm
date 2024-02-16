@@ -4,18 +4,17 @@
 \alias{getPairwiseSimilarityLoci}
 \title{Get Pairwise Similarity Loci}
 \usage{
-getPairwiseSimilarityLoci(file, verbose = TRUE)
+getPairwiseSimilarityLoci(file, verbose = TRUE, verbosity = 1)
 }
 \arguments{
 \item{file}{Path to the previous plink created ped file (with ped extension)}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{verbose}{Should the output be verbose, logical}
 
-\item{db}{Path to an existing genotype database}
+\item{verbosity}{Level of verbosity, set to higher number for more details
 
-\item{map}{Filepath to PlateDnoY.map file}
-
-\item{out}{Path to the output, can be emptu}
+#' @details
+Additional details...}
 }
 \value{
 A list containing the following elements:
@@ -24,4 +23,10 @@ summs, a matrix with summary statistics
 }
 \description{
 This function is a wrapper to a perl script to determine the loci of pairwise similarities
+}
+\examples{
+\dontrun{
+  getPairwiseSimilarityLoci()
+}
+
 }
