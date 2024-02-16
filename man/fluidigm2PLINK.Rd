@@ -36,7 +36,7 @@ fluidigm2PLINK(
 \item{verbosity}{Level of verbosity, set to higher number for more details
 
 #' @details
-Additional details...}
+Additional details ...}
 }
 \value{
 A ped/map file pair and optional diagnostic plots
