@@ -1,5 +1,6 @@
 # Fluidigm
-Fluidigm data analysis r-package
+Fluidigm data analysis r-package, a more detailed description and vignette with
+corresponding example data is on its way.
 
 # Installation
 You can install the package directly from GitHub using `devtools` like this
