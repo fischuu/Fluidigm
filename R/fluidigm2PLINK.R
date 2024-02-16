@@ -14,7 +14,7 @@
 #' @param verbosity Level of verbosity, set to higher number for more details
 #'
 #' #' @details
-#' Additional details...
+#' Additional details ...
 #'
 #' @examples
 #' \dontrun{
