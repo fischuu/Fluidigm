@@ -30,14 +30,14 @@ Please note, that you need to have Plink installed on your system and it needs t
 # Define y and x markers
   y.marker <- "DBY7"
   x.marker <- c("BICF2G630532567",
-                "BICF2P352871",
-                "BICF2P389125",
-                "BICF2S23244310",
-                "BICF2P1098274",
-                "BICF2S23042373",
-                "BICF2G630532118",
-                "BICF2G6307132",
-                "BICF2P192566")
+                "BICF2P345621",
+                "BICF2P354225",
+                "BICF2S23212310",
+                "BICF2P10954231",
+                "BICF2S23041234",
+                "BICF2G630532123",
+                "BICF2G63054321",
+                "BICF2P1922342")
 
 # Run the analysis
   out <- fluidigmAnalysisWrapper(file=file,
