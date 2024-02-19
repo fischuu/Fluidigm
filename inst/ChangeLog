@@ -6,6 +6,8 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 53: Input checks added to calculatePairwiseSimilarities.R
+* 52: More details to calculatePairwiseSimilarities.R added
 * 51: Added manual skeletons for Details and Examples
 * 50: Added the vignette skeleton
 * 49: Added co-authors and contributers

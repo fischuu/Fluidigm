@@ -17,3 +17,9 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(Fluidigm)
 ```
+
+# Preparations
+
+## Requirements
+
+Prior the installation of the Fluidigm package, please install it on your system. 

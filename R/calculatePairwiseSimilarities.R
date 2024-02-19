@@ -1,18 +1,22 @@
 #' @title Run plink to Calculate Pairwise Similarities
 #'
 #' @description
-#' This function is a wrapper to plink to calculate pairwise similarities
+#' This function serves as a wrapper to the PLINK software, which is a free, open-source whole genome association analysis toolset.
+#' It specifically uses PLINK to calculate pairwise similarities between genotypes.
 #'
-#' @param file Path to the filtered ped/map file pair (without ped/map file extension)
-#' @param db Path to an existing genotype database
-#' @param map Filepath to PlateDnoY.map file
-#' @param out Path to the output, can be empty
-#' @param sexing Logical, should the function try to perform sexing
-#' @param verbose Should the output be verbose, logical
-#' @param verbosity Level of verbosity, set to higher number for more details
+#' @param file A string representing the path to the filtered ped/map file pair (without ped/map file extension).
+#' @param db A string representing the path to an existing genotype database. If not provided, the function will proceed with the existing data.
+#' @param map A string representing the filepath to PlateDnoY.map file. If not provided, the function will use the map file with the same name as the ped file.
+#' @param out A string representing the path to the output. If not provided, the output will be written to a file with the same name as the input file, appended with "_oDB".
+#' @param sexing A logical value indicating whether the function should try to perform sexing. Default is TRUE.
+#' @param verbose A logical value indicating whether the output should be verbose. Default is TRUE.
+#' @param verbosity An integer representing the level of verbosity. Set to a higher number for more detailed output. Default is 1.
 #'
 #' @details
-#' Additional details...
+#' The function first checks the input parameters and sets default values if necessary. It then constructs and executes a PLINK command to merge
+#' the genotype output with the existing genotype database if one is provided. Finally, it calculates pairwise similarities for all samples (and
+#' database individuals) using another PLINK command. If the 'sexing' parameter is set to TRUE, the function will also attempt to determine the
+#' sex of the individuals.
 #'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
@@ -25,10 +29,31 @@
 #'
 #' @export
 
+
 calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1){
 
    ### Input check
    ##############################################################################
+   # Check if file exists
+   if (!file.exists(file)) {
+     stop("The specified file does not exist.")
+   }
+
+   # Check if db exists
+   if (!is.na(db) && !file.exists(db)) {
+     stop("The specified database does not exist.")
+   }
+
+   # Check if map exists
+   if (!is.na(map) && !file.exists(map)) {
+     stop("The specified map file does not exist.")
+   }
+
+ # Check if verbosity is a positive integer
+    if (!is.numeric(verbosity) || verbosity < 0) {
+      stop("The verbosity level should be a positive integer.")
+    }
+
     if(!verbose & verbosity > 0) verbosity <- 0
     verbose <- verbosity
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
