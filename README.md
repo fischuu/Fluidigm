@@ -53,7 +53,8 @@ Please note, that you need to have Plink installed on your system and it needs t
   fluidigm2PLINK(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE)
 ```
 
+
 # Acknowledgements
 The pacakge uses also a perl script that was written by Doug Scofield and which is published here:
 
-[plink-pairwise-loci.pl](https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl)
+https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl
