@@ -19,25 +19,25 @@ Please note, that you need to have Plink installed on your system and it needs t
   library("Fluidigm")
   
 # Set the working directory
-  setwd("~/tmp/fixing_sex_assign_fluiRscript")
+  setwd("~/Project/My_fluidigm_project")
 
 # Define the required files
-  file <- "Run22_1802150005_JH.csv"
-  map <- "Run22_1802150005_JH.map"
-  db <- "Run22_1802150005_JH.ped"
+  file <- "Run.csv"
+  map <- "Run.map"
+  db <- "Run.ped"
   neg_controls=c("STA-blank", "Chipblank")
   
 # Define y and x markers
-  y.marker <- "DBY7"
-  x.marker <- c("BICF2G630532567",
-                "BICF2P345621",
-                "BICF2P354225",
-                "BICF2S23212310",
-                "BICF2P10954231",
-                "BICF2S23041234",
-                "BICF2G630532123",
-                "BICF2G63054321",
-                "BICF2P1922342")
+  y.marker <- "markerY1"
+  x.marker <- c("markerX1",
+                "markerX2",
+                "markerX3",
+                "markerX4",
+                "markerX5",
+                "markerX6",
+                "markerX7",
+                "markerX8",
+                "markerX9")
 
 # Run the analysis
   out <- fluidigmAnalysisWrapper(file=file,
