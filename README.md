@@ -5,7 +5,7 @@ corresponding example data is on its way.
 # Installation
 You can install the package directly from GitHub using `devtools` like this
 
-````{r}
+```{r}
 devtools::install_github("fischuu/fluidigm")
 ```
 
