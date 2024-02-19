@@ -5,7 +5,7 @@ corresponding example data is on its way.
 # Installation
 You can install the package directly from GitHub using `devtools` like this
 
-````{r}
+```{r}
 devtools::install_github("fischuu/fluidigm")
 ```
 
@@ -19,25 +19,25 @@ Please note, that you need to have Plink installed on your system and it needs t
   library("Fluidigm")
   
 # Set the working directory
-  setwd("~/tmp/fixing_sex_assign_fluiRscript")
+  setwd("~/Project/My_fluidigm_project")
 
 # Define the required files
-  file <- "Run22_1802150005_JH.csv"
-  map <- "Run22_1802150005_JH.map"
-  db <- "Run22_1802150005_JH.ped"
+  file <- "Run.csv"
+  map <- "Run.map"
+  db <- "Run.ped"
   neg_controls=c("STA-blank", "Chipblank")
   
 # Define y and x markers
-  y.marker <- "DBY7"
-  x.marker <- c("BICF2G630532567",
-                "BICF2P352871",
-                "BICF2P389125",
-                "BICF2S23244310",
-                "BICF2P1098274",
-                "BICF2S23042373",
-                "BICF2G630532118",
-                "BICF2G6307132",
-                "BICF2P192566")
+  y.marker <- "markerY1"
+  x.marker <- c("markerX1",
+                "markerX2",
+                "markerX3",
+                "markerX4",
+                "markerX5",
+                "markerX6",
+                "markerX7",
+                "markerX8",
+                "markerX9")
 
 # Run the analysis
   out <- fluidigmAnalysisWrapper(file=file,
@@ -54,3 +54,7 @@ Please note, that you need to have Plink installed on your system and it needs t
 ```
 
 
+# Acknowledgements
+The pacakge uses also a perl script that was written by Doug Scofield and which is published here:
+
+https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl
