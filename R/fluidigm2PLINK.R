@@ -6,8 +6,8 @@
 #' PLINK format.
 #'
 #' @param file A string specifying the path to the input file in CSV format.
-#' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
 #' @param map A string specifying the filepath to the map-file that should be used.
+#' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
 #' @param plots A logical indicating whether additional figures for conversion should be plotted. Default is TRUE.
 #' @param rearrange A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.
 #' @param missing.geno A character string specifying how missing values should be coded. Default is "0 0".
@@ -21,6 +21,11 @@
 #' based on the information provided in the given map file. The function then creates a PED file and exports both files.
 #' If requested, the function also generates plots for genotyping success and additional summary statistics.
 #'
+#' This function uses the PLINK software[^1^][1]. For more information about PLINK, please refer to the official documentation.
+#'
+#' @references
+#' PLINK: Whole genome data analysis toolset - Harvard University[^1^][1]
+#'
 #' @examples
 #' \dontrun{
 #'   fluidigm2PLINK(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
@@ -30,7 +35,7 @@
 #' @export
 
 
-fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
+fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
   ### Input checks
   ##############################################################################
   if(!verbose & verbosity > 0) verbosity <- 0
