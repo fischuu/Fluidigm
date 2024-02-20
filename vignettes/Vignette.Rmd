@@ -22,4 +22,107 @@ library(Fluidigm)
 
 ## Requirements
 
-Prior the installation of the Fluidigm package, please install it on your system. 
+Prior the installation of the Fluidigm package, you need to install plink, please install it according to the
+Plink instructions on your system. The project webpage can be found here:
+
+https://www.cog-genomics.org/plink2/
+
+# Installation
+
+## Cran (tba)
+The `Fluidigm` package is hosted on Cran and can be installed via
+
+```
+install.packages("Fluidigm")
+```
+
+Stable release versions are usually even numbers like 0.2, 0.4, etc. 
+
+## GitHub
+The `Fluidigm` development platform is GitHub. The main-branch is usually similar to the Cran version. Also, published release versions on
+Cran are similar to Cran. Hence, the same version as Cran can be installed from GitHub
+
+```
+library("devtools")
+install_github("fischuu/Fluidigm")
+```
+
+Stable release versions are usually even numbers like 0.2, 0.4, etc.
+
+However, the latest development version is hosted also on GitHub in the dev-branch and is labeled with uneven numbers 0.3.\*, 0.5.\* ,
+where the \* indicates the running index of added features. These features are indicated in the CHANGELOG list and document the progress
+of the package.
+
+The latest development version of `Fluidigm` can be installed by running
+
+```
+library("devtools")
+install_github("fischuu/Fluidigm@dev")
+```
+
+# Usage
+
+The package is designed to run one function after another, namely
+
+
+  1. `fluidigm2PLINK(...)`
+  2. `estimateErrors(...)`
+  3. `calculatePairwiseSimilarities(...)`
+  4. `getPairwiseSimilarityLoci(...)`
+  5. `similarityMatrix(...)`
+  
+and the user can either run them one by one or execute them all at once, using the convenient `fluidigmAnalysisWrapper(...)`-wrapper function.
+
+## Example data and preparations
+
+You can download the file example_data.csv from HERE e.g. to the folder `~/My_fluidigm_project` to follow the vignette steps.
+
+Naturally, one first needs to load the `Fluidigm` library
+
+```{r}
+library("Fluidigm")
+```
+
+For convenience, we set first the working directory to avoid playing around with file paths
+
+```{r, eval=FALSE}
+setwd("~/My_fluidigm_project")
+```
+## Fluidigm to Plink
+
+The first step of the package functionality is to create a ped/map-file pair from the csv output that is received from the Fluidigm machine.
+
+The basic use of the function is like this
+ß
+```{r, eval=FALSE}
+fluidigm2PLINK(file = "example_data.csv",
+               map = "example_data.map",
+               out = "new_data")
+```
+
+Here, the `file` parameter is the file that is received from the Fluidigm machine and the `map` option expects the location details
+for the markers used in the Fluidigm, the `out` option defines the basename of the new generated files.
+
+Other non-obligaroty input options are `out`, a string specifying the output file name. If left empty, the original basename of the input file will be used for the new generated output. Then the logical flag `plots` indicats whether additional figures for conversion should be plotted. Default is TRUE. With the logical flag `rearrange` it can be controled if the order of the created
+ped/map filepair should follow the order given in the provided map file (option `TRUE`) or remain in the order as it is used in the Fluidigm file (option `FALSE`). The parameter `missing.geno` is a character string specifying how missing values should be coded. Default is "0 0". The logical option `fixNames` indicates whether whitespaces from sample names should be automatically removed. Default is TRUE. A file protection setting is the option `overwrite`. The logical indicates, wether the provided map sfile should be overwritten with the new map or not. By default, this is set to `FALSE` to avoid accidental file changes to the origianal file. If
+it is set to `TRUE` without providing a new filename to `out`, the original file is overwritten, if it is set to `FALSE` the function requires an input to `out` to avoid overwriting of the original map file. As in all other functions, the functions talk-activity can be controlled with the numerical `verbosity` value. Set to a higher number for more details. Default is 1. Verbosity can be switched off with the logical flag `verbose`.
+
+On case you want to overwrite the existing files and use the existing file names, the command would look like this
+
+```{r, eval = FALSE}
+fluidigm2PLINK(file = "example_data.csv",
+               map = "example_data.map", 
+               overwrite = TRUE)
+```
+
+### Output
+The function generates besides the ped-file also a set of verbose plots (if the default option `plots = TRUE` is set). These are namely
+
+1. `<filename>.additional_summary_stats.png`
+2. `<filename>.call_rate_markers.png`
+3. `<filename>.genotyping_success_samples.png`
+
+The two outputs `<filename>.call_rate_markers.png` and `<filename>.genotyping_success_samples.png` show barplots to indicate the 
+call rate of the genotypes and the genotyping success. The image`<filename>.additional_summary_stats.png` contains both of these,
+plus some additional information like output filenames, number of samples and number of markers.
+

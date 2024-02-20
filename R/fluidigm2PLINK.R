@@ -1,38 +1,47 @@
-#' @title Turn Fluidigm Output Into PLINK Format
+#' @title Convert Fluidigm Output to PLINK Format
 #'
 #' @description
-#' This function loads a fluidigm output and turns it into a PLINK format
+#' This function takes a Fluidigm output file and converts it into a PLINK format. The PLINK format is a widely used genetic
+#' variation data format. This function is useful for researchers who want to analyze Fluidigm data using tools that accept
+#' PLINK format.
 #'
-#' @param file Path to the input file
-#' @param out Out file name, keep empty to keep the original basename
-#' @param map Filepath to PlateD_withY.map file
-#' @param plots Logical, plot additional figures for conversion
-#' @param rearrange Logical, rearrange the ped/map output in order of ymap
-#' @param missing.geno Character, how shall missing values be coded
-#' @param fixNames logical, remove whitespaces from sample names automatically
-#' @param verbose Should the output be verbose, logical or numerical
-#' @param verbosity Level of verbosity, set to higher number for more details
+#' @param file A string specifying the path to the input file in CSV format.
+#' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
+#' @param map A string specifying the filepath to the map-file that should be used.
+#' @param plots A logical indicating whether additional figures for conversion should be plotted. Default is TRUE.
+#' @param rearrange A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.
+#' @param missing.geno A character string specifying how missing values should be coded. Default is "0 0".
+#' @param fixNames A logical indicating whether whitespaces from sample names should be automatically removed. Default is TRUE.
+#' @param overwrite A logical indicating wheter the original map file should be overwritten or not. Default FALSE
+#' @param verbose A logical or numerical value indicating whether the output should be verbose. Default is TRUE.
+#' @param verbosity A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.
 #'
-#' #' @details
-#' Additional details ...
+#' @details
+#' The function first checks the input parameters and then imports the Fluidigm data from the CSV file. It creates a new MAP file
+#' based on the information provided in the given map file. The function then creates a PED file and exports both files.
+#' If requested, the function also generates plots for genotyping success and additional summary statistics.
 #'
 #' @examples
 #' \dontrun{
-#'   fluidigm2PLINK()
+#'   fluidigm2PLINK(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 #' }
 #'
-#' @return A ped/map file pair and optional diagnostic plots
+#' @return A list containing the ped/map file pair and optional diagnostic plots.
 #' @export
 
-fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, verbose=TRUE, verbosity=1){
+
+fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
   ### Input checks
   ##############################################################################
   if(!verbose & verbosity > 0) verbosity <- 0
   verbose <- verbosity
   if(is.na(file)) stop("Please provide a csv file!")
   if(is.na(map)) stop("Please provide a map file!")
+  if(!file.exists(file)) stop("The file 'file' does not exist, please check the path!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
+
+  if(!overwrite & is.na(out)) stop("No new name for output provided and old output is set to 'no overwrite'. Please change either!")
 
   if(verbose){
     if(length(grep(" ", file))>0) warning("There are whitespaces in your input file, this will most likely crash your plink system call!\n
@@ -44,7 +53,12 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
 
   # Extract the file and directory name
     dirname <- dirname(file)
-    filename <- basename(file)
+    filename.in <- basename(file)
+    if(!is.na(out)) {
+      filename.out <- out
+    } else {
+      filename.out <- filename.in
+    }
   # Read the fluidigm data into a data table
     tmp <- readLines(file)
     skip <- which(tmp=="SNP Converted Calls")
@@ -111,7 +125,8 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
       if(truemap[i,4]!=0) ddmap[i,4] <- truemap[i,4]
     }
   # Export the .map file
-    map.filename <- gsub(".csv", ".map", filename)
+    #map.filename <- gsub(".csv", ".map", filename)
+    map.filename <- paste0(filename.out, ".map")
     if(verbose>1){
       cat("Export", nrow(ddmap), "markers into the new created map file:",map.filename,"\n")
     }
@@ -178,7 +193,8 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
     }
 
   # export ped file
-    ped.filename <- gsub(".csv", ".ped", filename)
+#    ped.filename <- gsub(".csv", ".ped", filename)
+    ped.filename <- paste0(filename.out, ".ped")
     write.table(ddped2, file = file.path(dirname, ped.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
   ### Create summary statistics
@@ -195,7 +211,8 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
       print(summary(genomark))
     }
     if(plots){
-      fig1.filename <- sub(".csv", ".call_rate_markers.png", filename)
+      #fig1.filename <- sub(".csv", ".call_rate_markers.png", filename)
+      fig1.filename <- paste0(filename.out, ".call_rate_markers.png")
       png(file.path(dirname, fig1.filename), width=1200, height=1200)
          hist(genomark, breaks=number_markers, xlim=c(0,ceiling(number_markers/10)*10 ), main='', xlab="Call rate, markers")
       dev.off()
@@ -214,7 +231,8 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
       print(summary(genosamp))
     }
     if(plots){
-      fig2.filename <- sub(".csv", ".genotyping_success_samples.png", filename)
+      #fig2.filename <- sub(".csv", ".genotyping_success_samples.png", filename)
+      fig2.filename <- paste0(filename.out, ".genotyping_success_samples.png")
       png(file.path(dirname, fig2.filename), width=1200, height=1200)
          hist(genosamp, breaks=number_samples, xlim=c(0,ceiling(number_samples/10)*10), main='', xlab="Genotyping success, samples")
       dev.off()
@@ -222,11 +240,12 @@ fluidigm2PLINK <- function(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, 
 
   # Some additional summary stats
     if(plots){
-       fig3.filename <- sub(".csv", ".additional_summary_stats.png", filename)
+       #fig3.filename <- sub(".csv", ".additional_summary_stats.png", filename)
+       fig3.filename <- paste0(filename.out, ".additional_summary_stats.png")
        png(file.path(dirname, fig3.filename), width=1200, height=1200)
        par(mfrow=c(2,2))
        plot(1,1, type="n", axes=FALSE, ylab=" ", xlab=" ")
-       text(1,1, paste("Input file name: ", filename),font=2, pos=1)
+       text(1,1, paste("Input file name: ", filename.in),font=2, pos=1)
        text(1,1, paste("Number of markers in MAP file: ", nrow(ddmap)), pos=1, offset=2)
        text(1,1, paste("Number of samples in PED file: ", nrow(ddped2)), pos=1, offset=3)
        text(1,1, paste("Output map file name: ", map.filename), pos=1, offset=4)

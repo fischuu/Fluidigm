@@ -6,6 +6,11 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 58: Bugfix: The out option in fluidigm2PLINK was not working properly
+* 57: Option overwrite added to fluidigm2PLINK function
+* 56: Vignette part of fluidigm2PLINK added
+* 55: Details in Rd file for fluidigm2PLINk added
+* 54: More input checks for fluidigm2PLINK
 * 53: Input checks added to calculatePairwiseSimilarities.R
 * 52: More details to calculatePairwiseSimilarities.R added
 * 51: Added manual skeletons for Details and Examples
