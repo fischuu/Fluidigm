@@ -202,4 +202,32 @@ In addition to that, the function provides the user also with a list, with two i
 per marker and sample. The samples are in the columns, the alleles in the rows. If an allele was called, the matrix is set to `TRUE`, if a allele is missing, the entry is set 
 to `NA`. 
 
-The `$summs` gives an informative summary data frame
+The `$summs` gives an informative summary data frame, depending on the picked options not all columns are always present, though. 
+
+| Column name | Details |
+|:------------|:--------|
+| Ind | The name of the individual sample | 
+| Ntrue | Number of alleles where replicate calls match | 
+| Nfalse | Number of alleles where replicate calls do not match | 
+| Nna | Number of alleles with missing data | 
+| Allele_error | Number of allele errors | 
+| Marker_dropout | Percentage of marker dropout | 
+| No_markers_repl1 | Number of missing markers in replicate 1 | 
+| No_markers_repl2 | Number of missing markers in replicate 2 | 
+| categ | Overall quality assessment, based on provided thresholds | 
+| noHetX1 | Number of heterogenous x-based markers for replicate 1 | 
+| noHetX2 | Number of heterogenous x-based markers for replicate 2 | 
+| noHetXtot | Number of total heterogenous x-based markers | 
+| noX1 | Number of x-based markers for replicate 1 | 
+| noX2 | Number of x-based markers for replicate 2 | 
+| noXtot | Total number of x-based markers | 
+| noY1 | Number of y-based markers for replicate 1 | 
+| noY2 | Number of y-based markers for replicate 2 | 
+| noYtot | Total number of y-based markers | 
+| sex | Estiamted sex, based on provided sexing threshold | 
+| noSPHetX1 | Number of heterogenous x-based species markers for replicate 1 | 
+| noSPHetX2 | Number of heterogenous x-based species markers for replicate 2 | 
+| noSPHetXtot | Total number of heterogenous x-based species markers| 
+| noSPX1 | Number of x-based species markers for replicate 1 | 
+| noSPX2 | Number of x-based species markers for replicate 2 | 
+| noSPXtot | Total number of x-based species markers |
