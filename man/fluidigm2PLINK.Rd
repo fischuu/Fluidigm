@@ -2,51 +2,63 @@
 % Please edit documentation in R/fluidigm2PLINK.R
 \name{fluidigm2PLINK}
 \alias{fluidigm2PLINK}
-\title{Turn Fluidigm Output Into PLINK Format}
+\title{Convert Fluidigm Output to PLINK Format}
 \usage{
 fluidigm2PLINK(
   file = NA,
-  out = NA,
   map = NA,
+  out = NA,
   plots = TRUE,
   rearrange = TRUE,
   missing.geno = "0 0",
   fixNames = TRUE,
+  overwrite = FALSE,
   verbose = TRUE,
   verbosity = 1
 )
 }
 \arguments{
-\item{file}{Path to the input file}
+\item{file}{A string specifying the path to the input file in CSV format.}
 
-\item{out}{Out file name, keep empty to keep the original basename}
+\item{map}{A string specifying the filepath to the map-file that should be used.}
 
-\item{map}{Filepath to PlateD_withY.map file}
+\item{out}{A string specifying the output file name. If left empty, the original basename of the input file will be used.}
 
-\item{plots}{Logical, plot additional figures for conversion}
+\item{plots}{A logical indicating whether additional figures for conversion should be plotted. Default is TRUE.}
 
-\item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+\item{rearrange}{A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.}
 
-\item{missing.geno}{Character, how shall missing values be coded}
+\item{missing.geno}{A character string specifying how missing values should be coded. Default is "0 0".}
 
-\item{fixNames}{logical, remove whitespaces from sample names automatically}
+\item{fixNames}{A logical indicating whether whitespaces from sample names should be automatically removed. Default is TRUE.}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{overwrite}{A logical indicating wheter the original map file should be overwritten or not. Default FALSE}
 
-\item{verbosity}{Level of verbosity, set to higher number for more details
+\item{verbose}{A logical or numerical value indicating whether the output should be verbose. Default is TRUE.}
 
-#' @details
-Additional details ...}
+\item{verbosity}{A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.}
 }
 \value{
-A ped/map file pair and optional diagnostic plots
+A list containing the ped/map file pair and optional diagnostic plots.
 }
 \description{
-This function loads a fluidigm output and turns it into a PLINK format
+This function takes a Fluidigm output file and converts it into a PLINK format. The PLINK format is a widely used genetic
+variation data format. This function is useful for researchers who want to analyze Fluidigm data using tools that accept
+PLINK format.
+}
+\details{
+The function first checks the input parameters and then imports the Fluidigm data from the CSV file. It creates a new MAP file
+based on the information provided in the given map file. The function then creates a PED file and exports both files.
+If requested, the function also generates plots for genotyping success and additional summary statistics.
+
+This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
 }
 \examples{
 \dontrun{
-  fluidigm2PLINK()
+  fluidigm2PLINK(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 }
 
+}
+\references{
+PLINK: Whole genome data analysis toolset - Harvard University
 }

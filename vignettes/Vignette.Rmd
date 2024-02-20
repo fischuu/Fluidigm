@@ -1,6 +1,10 @@
 ---
 title: "Vignette"
-output: rmarkdown::html_vignette
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: default
 vignette: >
   %\VignetteIndexEntry{Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,7 +18,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, eval=FALSE}
 library(Fluidigm)
 ```
 
@@ -32,7 +36,7 @@ https://www.cog-genomics.org/plink2/
 ## Cran (tba)
 The `Fluidigm` package is hosted on Cran and can be installed via
 
-```
+```{r, eval=FALSE}
 install.packages("Fluidigm")
 ```
 
@@ -42,7 +46,7 @@ Stable release versions are usually even numbers like 0.2, 0.4, etc.
 The `Fluidigm` development platform is GitHub. The main-branch is usually similar to the Cran version. Also, published release versions on
 Cran are similar to Cran. Hence, the same version as Cran can be installed from GitHub
 
-```
+```{r, eval=FALSE}
 library("devtools")
 install_github("fischuu/Fluidigm")
 ```
@@ -55,7 +59,7 @@ of the package.
 
 The latest development version of `Fluidigm` can be installed by running
 
-```
+```{r, eval=FALSE}
 library("devtools")
 install_github("fischuu/Fluidigm@dev")
 ```
@@ -93,7 +97,7 @@ setwd("~/My_fluidigm_project")
 The first step of the package functionality is to create a ped/map-file pair from the csv output that is received from the Fluidigm machine.
 
 The basic use of the function is like this
-ß
+
 ```{r, eval=FALSE}
 fluidigm2PLINK(file = "example_data.csv",
                map = "example_data.map",
@@ -126,3 +130,76 @@ The two outputs `<filename>.call_rate_markers.png` and `<filename>.genotyping_su
 call rate of the genotypes and the genotyping success. The image`<filename>.additional_summary_stats.png` contains both of these,
 plus some additional information like output filenames, number of samples and number of markers.
 
+## Estimate errors
+
+The `estimateErrors` function is a powerful tool designed to process PLINK ped files and estimate errors. It provides a comprehensive analysis of genotyping data, ensuring the accuracy and reliability of your results. This function is particularly useful in large-scale genetic studies where error estimation is crucial for data integrity.
+
+One of the key features of `estimateErrors` is its ability to perform sex assignment and species marker analysis, if required. This is achieved by using the provided Y and X markers for sexing and species-identification markers for species analysis. 
+
+The function is highly customizable, allowing you to specify various parameters such as the path to the ped input file, the database name, and whether new samples should be added to the database. It also allows you to control the number of replicates to keep, the markers for sexing and species identification, and the thresholds for various error checks.
+
+Additionally, `estimateErrors` can create plots for visual inspection of the data and provides verbose output for detailed analysis. It returns a list containing a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing, and a matrix with summary statistics.
+
+In summary, `estimateErrors` is an essential function for anyone working with PLINK ped files, providing a robust and flexible solution for error estimation, sex assignment, and species marker analysis.
+
+The basic use in the running example is as follows
+
+```{r, eval=FALSE}
+estErr.out <- estimateErrors(file="new_data.ped")
+```
+
+The default values to estimate the errors of the fluidigm run as `allele_error = 5`, `marker_dropout = 15` and `no_marker = 50`. That means, individuals are flags to be bad
+samples, if either of the criteria is met. The allele errors are here absolte values, the marker dropout is calcualte as percentage and the number of total marker yield is again an absolute value. If the function detects bad samples, it write out a file called `<filename>.ped_samples_to_RERUN.txt` that contains samplenames from samples that
+should be rerun, as they did not fulfil the minimum quality requirements.
+
+For sexing, we need to do two things. First we need to activate the sexing module by setting `sexing=TRUE` and then add markers placed on the y-chromosome to `y.marker` and
+markers from x-chromosome to `x.marker`. These two marker sets will be used for the sexing. For that marker set, the parameters provided in `male.y`, `male.hetX`, `female.y` , `female.Xtot`, `female.hetXtot`, `warning.noYtot` and `warning.noHetXtot` are used. These values give the number of detected markers, meaning, if e.g. `male.y` is set to 3, three of the `y.marker` needs to be detected in an individual to be classified to be male, then `male.hetX` gives the number of heterogeneous X-based markers need to be present and so forth.
+
+```{r, eval=FALSE}
+estErr.out <- estimateErrors(file="new_data.ped",
+                             sexing = TRUE,
+                             y.marker = "DBY7",
+                             x.marker = c("BICF2G63", 
+                                          "BICF2P19"))
+```
+
+Besides sexing, the function can also be used to flag for particular species. Here, a list of markers can be provided to the option `sp.marker` and based on that
+individuals are checked for the presence of this marker set and the summary values are given in the output data matrix.
+
+```{r, eval=FALSE}
+estErr.out <- estimateErrors(file="new_data.ped",
+                             sp.marker = "BICF2P5")
+```
+
+Naturally, performing sexing and species classification can be performed together like this
+
+```{r, eval=FALSE}
+estErr.out <- estimateErrors(file="new_data.ped",
+                             sexing = TRUE,
+                             y.marker = "DBY7",
+                             x.marker = c("BICF2G63", "BICF2P19"),
+                             sp.marker = "BICF2P5")
+```
+
+### Output
+The function generates a couple of output files, namely
+
+1. `<filename>.ped_samples_to_RERUN.txt`
+2. `<filename>.ped_summary_individuals.csv`
+3. `<filename>.new_data.GOOD.map`
+4. `<filename>.new_data.GOOD.ped`
+5. `<filename>.allele_error_marker_dropout.png`
+
+Here, the first output (`<filename>.ped_samples_to_RERUN.txt`) just provides a list of samples flaged to have BAD quality. Each row contains one sample name. The file
+`<filename>.ped_summary_individuals.csv` contains the same information provided as list output from the `estimateErrors()` function, see details below. The ped/map filepair
+`<filename>.new_data.GOOD.map` and `<filename>.new_data.GOOD.ped` contains a filtered version of the input ped file, with bad samples removed. The map file remains unchanged
+and no alleles are removed from it.
+
+If the option `plots = TRUE` is set (default), also diagnostic plots are generated. Here, a barplot shows the frequency the different allele errors across all markers, then
+another shows the marker dropout rate (in percent) across all markers and then a scatterplot of the allele error rate versus the marker droput rate.
+
+In addition to that, the function provides the user also with a list, with two items `$gensim` and `$summs`. The `$gensim` list object provides information on the allele calls
+per marker and sample. The samples are in the columns, the alleles in the rows. If an allele was called, the matrix is set to `TRUE`, if a allele is missing, the entry is set 
+to `NA`. 
+
+The `$summs` gives an informative summary data frame

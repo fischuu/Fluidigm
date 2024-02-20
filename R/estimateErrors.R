@@ -1,33 +1,36 @@
-#' @title Process the PLINK ped files
+#' @title Estimate Errors in PLINK ped files
 #'
 #' @description
-#' This function processes the PLINK ped files
+#' This function processes the PLINK ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
 #'
-#' @param file Path to the ped input file
-#' @param db Name of the used database
-#' @param appendSamplesToDB Logical, shoud new samples be added to database
-#' @param keep.rep numeric, keep only this n-fold replicates, default n=2
-#' @param y.marker Y markers for sexing
-#' @param x.marker X markers for sexing
-#' @param sp.marker Markers used for species-identification
-#' @param plots logical, shall plots be created?
-#' @param neg_controls Names of negative controls
-#' @param allele_error Threshold for RERUN on Allele errors
-#' @param marker_dropout Threshold for RERUN on Marker dropout
-#' @param no_marker Number of markers
-#' @param male.y Threshold for sexing, male y-chromosome markers
-#' @param male.hetX Threshold for sexing, heterozygote x-chr markers
-#' @param female.y Threshold for sexing, female y-chromosome markers
-#' @param female.Xtot Threshold for sexing, total female x-chr markers
-#' @param female.hetXtot Threshold for sexing, heterozygote x-chr markers
-#' @param warning.noYtot  Threshold for sexing, when should warning be triggered
-#' @param warning.noHetXtot  Threshold for sexing, when should warning be triggered
-#' @param sexing Logical, if sexing should be performed
-#' @param verbose Should the output be verbose, logical or numerical
-#' @param verbosity Level of verbosity, set to higher number for more details
+#' @param file A string. Path to the ped input file.
+#' @param db A string. Name of the used database. Default is NA.
+#' @param appendSamplesToDB A logical. Should new samples be added to database? Default is FALSE.
+#' @param keep.rep A numeric. Keep only this n-fold replicates, default n=1.
+#' @param y.marker A vector. Y markers for sexing. Default is NA.
+#' @param x.marker A vector. X markers for sexing. Default is NA.
+#' @param sp.marker A vector. Markers used for species-identification. Default is NA.
+#' @param plots A logical. Should plots be created? Default is TRUE.
+#' @param neg_controls A vector. Names of negative controls. Default is NA.
+#' @param allele_error A numeric. Threshold for RERUN on Allele errors. Default is 5.
+#' @param marker_dropout A numeric. Threshold for RERUN on Marker dropout. Default is 15.
+#' @param no_marker A numeric. Number of markers. Default is 50.
+#' @param male.y A numeric. Threshold for sexing, male y-chromosome markers. Default is 3.
+#' @param male.hetX A numeric. Threshold for sexing, heterozygote x-chr markers. Default is 0.
+#' @param female.y A numeric. Threshold for sexing, female y-chromosome markers. Default is 0.
+#' @param female.Xtot A numeric. Threshold for sexing, total female x-chr markers. Default is 8.
+#' @param female.hetXtot A numeric. Threshold for sexing, heterozygote x-chr markers. Default is 3.
+#' @param warning.noYtot A numeric. Threshold for sexing, when should warning be triggered. Default is 2.
+#' @param warning.noHetXtot A numeric. Threshold for sexing, when should warning be triggered. Default is 3.
+#' @param sexing A logical. Should sexing be performed? Default is FALSE.
+#' @param verbose A logical or numeric. Should the output be verbose? Default is TRUE.
+#' @param verbosity A numeric. Level of verbosity, set to higher number for more details. Default is 1.
 #'
-#' #' @details
-#' Additional details...
+#' @details
+#' This function processes the PLINK ped files and estimates errors. It checks if the first and second run of each sample have the same genotype and if both
+#' replicates are identical. It also performs sex assignment based on the provided Y and X markers. If species marker is provided, it performs species marker
+#' analysis. The function creates a consensus PED for all "GOOD" samples and exports it along with a .map file without the Y-markers. It also creates a
+#' database file, if provided.
 #'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
@@ -35,33 +38,82 @@
 #'
 #' @examples
 #' \dontrun{
-#'   estimateErrors()
+#'   estimateErrors(file = "your_file.ped")
 #' }
 #' @export
+
 
 estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
                            y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA,
                            allele_error=5, marker_dropout=15, no_marker=50,
                            male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
-                           warning.noYtot=2, warning.noHetXtot=3, sexing=TRUE, verbose=TRUE, verbosity=1){
+                           warning.noYtot=2, warning.noHetXtot=3, sexing=FALSE, verbose=TRUE, verbosity=1){
 
   # Input checks
+  if(!file.exists(file)){
+    stop("The file does not exist. Please provide a valid file path.")
+  }
+
+  if(!is.na(db) && !file.exists(db)){
+    stop("The database file does not exist. Please provide a valid database file path or set db to NA.")
+  }
+
+  if(!is.logical(appendSamplesToDB)){
+    stop("appendSamplesToDB should be a logical value (TRUE or FALSE).")
+  }
+
+  if(!is.numeric(keep.rep) || keep.rep < 0){
+    stop("keep.rep should be a non-negative numeric value.")
+  }
+
+  if(sexing && is.na(y.marker)){
+    stop("You do not provide a vector with marker names to y.marker for sexing!")
+  }
+
+  if(!is.logical(plots)){
+    stop("plots should be a logical value (TRUE or FALSE).")
+  }
+
+  if(!is.numeric(allele_error) || allele_error < 0){
+    stop("allele_error should be a non-negative numeric value.")
+  }
+
+  if(!is.numeric(marker_dropout) || marker_dropout < 0){
+    stop("marker_dropout should be a non-negative numeric value.")
+  }
+
+  if(!is.numeric(no_marker) || no_marker < 0){
+    stop("no_marker should be a non-negative numeric value.")
+  }
+
+  if(!is.numeric(male.y) || male.y < 0){
+    stop("male.y should be a non-negative numeric value.")
+  }
+
+  if(!is.numeric(male.hetX) || male.hetX < 0){
+    stop("male.hetX should be a non-negative numeric value.")
+  }
+
     if(!verbose & verbosity > 0) verbosity <- 0
     verbose <- verbosity
     ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
-    if(sexing) if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
+
+    if(sexing){
+      if(any(is.na(y.marker))) stop("You do not provide a vector with marker names to y.marker!")
+      if(any(is.na(x.marker))) stop("You do not provide a vector with marker names to x.marker!")
+      }
 
   # Welcome screen
   if(sexing){
     if(verbose>0){
-      cat("Sex determination settings:\n")
-      cat("-------------------------------\n")
-      cat("MALE      : Call as MALE, if number of Y total (noYtot) >=", male.y,"(male.y - option) AND noHetXtot <=", male.hetX,"(male.hetX - option)\n")
-      cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND number of total X (noXtot)is >= ",female.Xtot,"(female.Xtot - option)\n")
-      cat("FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y,"(female.y - option) AND noHetXtot >= ",female.hetXtot, "(female.hetXtot - option)\n")
-      cat("WARNING   : Call as WARNING, if if number of Y total (noYtot) >= ",warning.noYtot,"(warning.noYtot - option) and noHetXtot >= ",warning.noHetXtot,"(warning.noHetXtot - option\n")
-      cat("UNCERTAIN : Call as Uncertain, if marker dropout > 25% \n")
-      cat("Unhandled : All other cases will be marked as unhandled (this case should not happen...)\n")
+      message(c("Sex determination settings:\n",
+                "-------------------------------\n",
+                "MALE      : Call as MALE, if number of Y total (noYtot) >=", male.y," (male.y - option) AND noHetXtot <=", male.hetX," (male.hetX - option)\n",
+                "FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y," (female.y - option) AND number of total X (noXtot)is >= ",female.Xtot," (female.Xtot - option)\n",
+                "FEMALE    : Call as FEMALE, if number of Y total (noYtot) equals == ",female.y," (female.y - option) AND noHetXtot >= ",female.hetXtot, " (female.hetXtot - option)\n",
+                "WARNING   : Call as WARNING, if if number of Y total (noYtot) >= ",warning.noYtot," (warning.noYtot - option) and noHetXtot >= ",warning.noHetXtot," (warning.noHetXtot - option\n",
+                "UNCERTAIN : Call as Uncertain, if marker dropout > 25% \n",
+                "Unhandled : All other cases will be marked as unhandled (this case should not happen...)\n"))
     }
   }
 
@@ -193,18 +245,15 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
       }
 
   ### Add category
-  # "BAD" if marker dropout > 85% (needs to be tweaked to rerun also samples where one was good and one bad...)
-  # "BAD" if both replicates have No_markers_repl1 AND No_markers_repl2 > 79 (85% of 93)
-  # "RERUN" if marker dropout 85% - 15%, or error rate > 5%
-  # "GOOD" else
     summs$categ <- as.factor("GOOD")
     levels(summs$categ) <- c("GOOD","RERUN","BAD")
 
     if(verbose > 1){
-      cat("Marker classification is based on those thresholds:\n",
-          "Allele errors between replicates (if present):", allele_error,"\n",
-          "Marker dropout :", marker_dropout,"\n",
-          "Number of missing marker per replicate:",no_marker , "\n")
+      message("Marker classification is based on those thresholds\n",
+              "--------------------------------------------------\n",
+              "Allele errors between replicates (if present): ", allele_error,"\n",
+              "Marker dropout: ", marker_dropout,"\n",
+              "Number of missing marker per replicate: ",no_marker , "\n")
     }
     summs$categ[summs$Allele_error > allele_error] <- "RERUN"
     summs$categ[summs$Marker_dropout > marker_dropout] <- "RERUN"
@@ -266,10 +315,10 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
       ind <- unique(nam)[i]
       indgen <- ped[ped$V2==ind,]
       if(verbose>1 && i==1){
-        cat("\nConsider the following columns in ped-file:\n")
+        message("\nConsider the following columns in ped-file:\n")
         for(indY in 1:(length(remove_y)/2)){
           writeThis <- indY*2
-          cat(remove_y[c(writeThis-1, writeThis)], "(", as.character(map1$V2[floor((remove_y[writeThis-1])/2)[1]-2]),")\n")
+          message(remove_y[c(writeThis-1, writeThis)], "(", as.character(map1$V2[floor((remove_y[writeThis-1])/2)[1]-2]),")\n")
         }
 
       }
@@ -302,12 +351,12 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     remove_x <- sort(c(x_marker_pos*2+5, x_marker_pos*2+6))
 
     if(verbose>1){
-      cat("Base x-marker analysis on the following markers:\n")
+      message("Base x-marker analysis on the following markers:\n")
       for(i in 1:length(x_marker_pos)){
-        cat(as.character(map1$V2)[x_marker_pos[i]],"\n")
+        message(as.character(map1$V2)[x_marker_pos[i]],"\n")
       }
-      cat("\nConsider the following columns in ped-file:\n")
-      cat(remove_x,"\n")
+      message("\nConsider the following columns in ped-file:\n")
+      message(remove_x,"\n")
     }
 
     for(i in 1:length(unique(nam))){
@@ -369,11 +418,12 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
       summs$sex[summs$noYtot >= warning.noYtot & summs$noHetXtot >= warning.noHetXtot] <- "WARNING"
     # lastly call all sex as "Uncertain" if Marker dropout > 25%
       summs$sex[summs$Marker_dropout > 25] <- "Uncertain"
-
+    } # from if(sexing)
 
   # Process the species marker set sp.marker
       # Remove y-chromosome based markers
-      if(sum(!is.na(sp.marker))>0 ){
+      if(any(!is.na(sp.marker))){
+  #    if(sum(!is.na(sp.marker))>0 ){
         ### Sex assignment
         summs$noSPHetX1 <- NA
         summs$noSPHetX2 <- NA
@@ -384,19 +434,22 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
 
         sp_marker_pos <- NULL
         if(sum(is.numeric(sp.marker))>0 | sum(sp.marker=="X")>0){
+          #if(verbose>1) message("A complete chromosome is provided as species marker, we'll use all markers located in chromosome ", sp.marker)
           sp_marker_pos <- which(is.element(map1$V1, sp.marker))
         } else {
+          #if(verbose>1) message("A marker list was provided as species marker, we'll use the following markers to classify species:\n", sp.marker)
           sp_marker_pos <- which(is.element(map1$V2, sp.marker))
         }
+
         remove_sp <- sort(c(sp_marker_pos*2+5, sp_marker_pos*2+6))
 
         if(verbose>1){
-          cat("Base species-marker analysis on the following markers:\n")
+          message("Base species-marker analysis on the following markers:\n")
           for(i in 1:length(sp_marker_pos)){
-            cat(as.character(map1$V2)[sp_marker_pos[i]],"\n")
+            message(as.character(map1$V2)[sp_marker_pos[i]],"\n")
           }
-          cat("\nConsider the following columns in ped-file:\n")
-          cat(remove_sp,"\n")
+          message("\nConsider the following columns in ped-file:\n")
+          message(remove_sp,"\n")
         }
 
         for(i in 1:length(unique(nam))){
@@ -445,8 +498,10 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
           summs$noSPXtot[summs$Ind==ind] <- sum(SPtgeno1,SPtgeno2, na.rm=TRUE)
         }
 
+      } else {
+        if(verbosity>1) message("No species markers provided to sp.marker")
       }
-  }
+#  }  # From if(sexing)
 
     ### Export table with summary data for each sample
     ###################################################################
@@ -558,7 +613,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
             write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
           }
         } else {
-          if(verbose>0) cat("Provided database file not found, create a new one with existing data!\n")
+          if(verbose>0) message("Provided database file not found, create a new one with existing data!\n")
           database <- GoodPed
           write.table(database, file = file.path(dirname, db), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
         }
@@ -572,7 +627,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
         map.filename <- gsub(".ped", ".GOOD.map", filename)
         write.table(map1, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
       }
-      if(verbose>0) cat("\n ### Estimating errors: DONE! ",date(),"\n","##############################################################\n")
+      if(verbose>0) message("### Estimating errors: DONE! ",date(),"\n","##############################################################\n")
 
       output <- list(gensim=gensim,
                      summs=summs)

@@ -2,8 +2,8 @@
 % Please edit documentation in R/Fluidigm-package.R
 \docType{package}
 \name{Fluidigm}
-\alias{Fluidigm}
 \alias{Fluidigm-package}
+\alias{Fluidigm}
 \title{Fluidigm}
 \description{
 The package is aimed for Fluidigm users to handle data coming in Plink format.

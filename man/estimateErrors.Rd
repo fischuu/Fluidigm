@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateErrors.R
 \name{estimateErrors}
 \alias{estimateErrors}
-\title{Process the PLINK ped files}
+\title{Estimate Errors in PLINK ped files}
 \usage{
 estimateErrors(
   file,
@@ -24,58 +24,55 @@ estimateErrors(
   female.hetXtot = 3,
   warning.noYtot = 2,
   warning.noHetXtot = 3,
-  sexing = TRUE,
+  sexing = FALSE,
   verbose = TRUE,
   verbosity = 1
 )
 }
 \arguments{
-\item{file}{Path to the ped input file}
+\item{file}{A string. Path to the ped input file.}
 
-\item{db}{Name of the used database}
+\item{db}{A string. Name of the used database. Default is NA.}
 
-\item{appendSamplesToDB}{Logical, shoud new samples be added to database}
+\item{appendSamplesToDB}{A logical. Should new samples be added to database? Default is FALSE.}
 
-\item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
+\item{keep.rep}{A numeric. Keep only this n-fold replicates, default n=1.}
 
-\item{y.marker}{Y markers for sexing}
+\item{y.marker}{A vector. Y markers for sexing. Default is NA.}
 
-\item{x.marker}{X markers for sexing}
+\item{x.marker}{A vector. X markers for sexing. Default is NA.}
 
-\item{sp.marker}{Markers used for species-identification}
+\item{sp.marker}{A vector. Markers used for species-identification. Default is NA.}
 
-\item{plots}{logical, shall plots be created?}
+\item{plots}{A logical. Should plots be created? Default is TRUE.}
 
-\item{neg_controls}{Names of negative controls}
+\item{neg_controls}{A vector. Names of negative controls. Default is NA.}
 
-\item{allele_error}{Threshold for RERUN on Allele errors}
+\item{allele_error}{A numeric. Threshold for RERUN on Allele errors. Default is 5.}
 
-\item{marker_dropout}{Threshold for RERUN on Marker dropout}
+\item{marker_dropout}{A numeric. Threshold for RERUN on Marker dropout. Default is 15.}
 
-\item{no_marker}{Number of markers}
+\item{no_marker}{A numeric. Number of markers. Default is 50.}
 
-\item{male.y}{Threshold for sexing, male y-chromosome markers}
+\item{male.y}{A numeric. Threshold for sexing, male y-chromosome markers. Default is 3.}
 
-\item{male.hetX}{Threshold for sexing, heterozygote x-chr markers}
+\item{male.hetX}{A numeric. Threshold for sexing, heterozygote x-chr markers. Default is 0.}
 
-\item{female.y}{Threshold for sexing, female y-chromosome markers}
+\item{female.y}{A numeric. Threshold for sexing, female y-chromosome markers. Default is 0.}
 
-\item{female.Xtot}{Threshold for sexing, total female x-chr markers}
+\item{female.Xtot}{A numeric. Threshold for sexing, total female x-chr markers. Default is 8.}
 
-\item{female.hetXtot}{Threshold for sexing, heterozygote x-chr markers}
+\item{female.hetXtot}{A numeric. Threshold for sexing, heterozygote x-chr markers. Default is 3.}
 
-\item{warning.noYtot}{Threshold for sexing, when should warning be triggered}
+\item{warning.noYtot}{A numeric. Threshold for sexing, when should warning be triggered. Default is 2.}
 
-\item{warning.noHetXtot}{Threshold for sexing, when should warning be triggered}
+\item{warning.noHetXtot}{A numeric. Threshold for sexing, when should warning be triggered. Default is 3.}
 
-\item{sexing}{Logical, if sexing should be performed}
+\item{sexing}{A logical. Should sexing be performed? Default is FALSE.}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{verbose}{A logical or numeric. Should the output be verbose? Default is TRUE.}
 
-\item{verbosity}{Level of verbosity, set to higher number for more details
-
-#' @details
-Additional details...}
+\item{verbosity}{A numeric. Level of verbosity, set to higher number for more details. Default is 1.}
 }
 \value{
 A list containing the following elements:
@@ -83,10 +80,16 @@ gensim, a matrix indicating if genotypes are called correctly for replicates and
 summs, a matrix with summary statistics
 }
 \description{
-This function processes the PLINK ped files
+This function processes the PLINK ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
+}
+\details{
+This function processes the PLINK ped files and estimates errors. It checks if the first and second run of each sample have the same genotype and if both
+replicates are identical. It also performs sex assignment based on the provided Y and X markers. If species marker is provided, it performs species marker
+analysis. The function creates a consensus PED for all "GOOD" samples and exports it along with a .map file without the Y-markers. It also creates a
+database file, if provided.
 }
 \examples{
 \dontrun{
-  estimateErrors()
+  estimateErrors(file = "your_file.ped")
 }
 }

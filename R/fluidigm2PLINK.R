@@ -21,10 +21,10 @@
 #' based on the information provided in the given map file. The function then creates a PED file and exports both files.
 #' If requested, the function also generates plots for genotyping success and additional summary statistics.
 #'
-#' This function uses the PLINK software[^1^][1]. For more information about PLINK, please refer to the official documentation.
+#' This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
 #'
 #' @references
-#' PLINK: Whole genome data analysis toolset - Harvard University[^1^][1]
+#' PLINK: Whole genome data analysis toolset - Harvard University
 #'
 #' @examples
 #' \dontrun{
@@ -36,6 +36,7 @@
 
 
 fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
+
   ### Input checks
   ##############################################################################
   if(!verbose & verbosity > 0) verbosity <- 0
@@ -44,9 +45,10 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
   if(is.na(map)) stop("Please provide a map file!")
   if(!file.exists(file)) stop("The file 'file' does not exist, please check the path!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
+  if(!overwrite & is.na(out)) stop("No new name for output provided and old output is set to 'no overwrite'. Please change either!")
+
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
-  if(!overwrite & is.na(out)) stop("No new name for output provided and old output is set to 'no overwrite'. Please change either!")
 
   if(verbose){
     if(length(grep(" ", file))>0) warning("There are whitespaces in your input file, this will most likely crash your plink system call!\n
@@ -96,7 +98,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
       if(sum(comp) < nrow(truemap)){
         if(sum(is.element(truemap$MAP,ddmap$X2))<nrow(truemap)){
           if(verbose){
-            cat("Mismatching entries between MAP entries:\n-----------------------------------------------------------------\n")
+            message("Mismatching entries between MAP entries:\n-----------------------------------------------------------------\n")
             printThis <- cbind(ddmap$X2[!comp], truemap$MAP[!comp])
             colnames(printThis) <- c("file-input", "map-input")
             print(printThis)
@@ -104,7 +106,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
           }
         }
         if(rearrange){
-          if(verbose>1) print("Markers are not in the same order as in the provided map file, rearrange the output!")
+          if(verbose>1) message("Markers are not in the same order as in the provided map file, rearrange the output!")
           for(i in 1:nrow(truemap)){
             newOrderEntry <- which(truemap$MAP[i] == ddmap[,2])
             if(length(newOrderEntry)==0){
@@ -117,10 +119,10 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
           stop("ERROR!!! Markers are not in correct order. Either change the order or set rearrange=TRUE to adjust the order of fluidigm file.")
         }
       } else {
-        if(verbose>1) print("Markers are in the same order as map file")
+        if(verbose>1) message("Markers are in the same order as map file")
       }
   } else {
-     if(verbose>1) cat("No map file provided, create one based on marker IDs from csv file\n")
+     if(verbose>1) message("No map file provided, create one based on marker IDs from csv file\n")
   }
 
   # Populate the new map file with information from the provided map file
@@ -133,7 +135,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
     #map.filename <- gsub(".csv", ".map", filename)
     map.filename <- paste0(filename.out, ".map")
     if(verbose>1){
-      cat("Export", nrow(ddmap), "markers into the new created map file:",map.filename,"\n")
+      message("Export", nrow(ddmap), "markers into the new created map file:",map.filename,"\n")
     }
     write.table(ddmap, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
@@ -146,9 +148,9 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
     }
     ddped1 <- dd
     number_samples <- nrow(ddped1)
-    if(verbose>1) cat("Number of samples in data:",number_samples, "\n")
+    if(verbose>1) message("Number of samples in data:",number_samples, "\n")
     number_markers <- ncol(ddped1)-2
-    if(verbose>1) cat("Number of markers in data:",number_markers, "\n")
+    if(verbose>1) message("Number of markers in data:",number_markers, "\n")
 
   # Add columns for sex-information
     ddped <- ddped1
@@ -211,8 +213,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
     }
     genomark[is.na(genomark)]<- 0
     if(verbose>1){
-      cat("Summary of call rate markers\n
-             --------------------------------------\n")
+      message("Summary of call rate markers\n--------------------------------------\n")
       print(summary(genomark))
     }
     if(plots){
@@ -231,8 +232,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
     }
     genosamp[is.na(genosamp)]<- 0
     if(verbose>1){
-      cat("Summary of genotyping success\n
-             --------------------------------------\n")
+      message("Summary of genotyping success\n--------------------------------------\n")
       print(summary(genosamp))
     }
     if(plots){
@@ -260,5 +260,5 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
        dev.off()
     }
 
-  if(verbose>0)cat("\n ### Conversion: DONE! ",date(),"\n","##############################################################\n")
+  if(verbose>0)message("\n### Conversion: DONE! ",date(),"\n","##############################################################\n")
 }

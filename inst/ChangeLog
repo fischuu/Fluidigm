@@ -6,6 +6,11 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 63: Bugfix: estimateErrors concidered sp.markers only when sexing was performed, they act no independent
+* 62: Changed sexing=FALSE as new default in estimateErrors()
+* 61: Added more careful input checks to estimateErrors
+* 60: Updated the function description for estimateErrors
+* 59: Harmonised the output from 'cat' and 'print' to 'message' in fluidigm2PLINK
 * 58: Bugfix: The out option in fluidigm2PLINK was not working properly
 * 57: Option overwrite added to fluidigm2PLINK function
 * 56: Vignette part of fluidigm2PLINK added
