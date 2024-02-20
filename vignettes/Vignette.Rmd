@@ -181,6 +181,11 @@ estErr.out <- estimateErrors(file="new_data.ped",
                              sp.marker = "BICF2P5")
 ```
 
+### Replicates
+The function can also handle replicates and negative controls inside the data. 
+
+<tbc>
+
 ### Output
 The function generates a couple of output files, namely
 

@@ -136,9 +136,9 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
       ped <- ped1[-which(is.element(ped1$V2, remove_those)),]
       ped$V2 <- factor(ped$V2)
       if(verbose>1){
-        cat("Remove samples (based on too low/high repitition \n------------------------------------------------\n")
+        message("Remove samples (based on too low/high repitition \n------------------------------------------------\n")
         for(i in 1:length(remove_those)){
-          cat(remove_those[i],"\n")
+          message(remove_those[i],"\n")
         }
       }
     } else {
@@ -157,9 +157,9 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     }
     if(length(marker_pos)==0) warning("No y-markers found. Please check your option y.marker to be either numeric and marker names. The map file needs to have then either information to be present.\n")
     if(verbose>1){
-      cat("Remove markers\n---------------------------\n")
+      message("Remove markers\n---------------------------\n")
       for(i in 1:length(marker_pos)){
-        cat(as.character(map1$V2[marker_pos[i]]),"\n")
+        message(as.character(map1$V2[marker_pos[i]]),"\n")
       }
     }
     remove_y <- c(marker_pos*2+5, marker_pos*2+6)
