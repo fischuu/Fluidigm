@@ -294,9 +294,37 @@ the list of samples with ambigous sex-codes. If the sexing did not go well (or w
 additional option `sexing=FALSE` needs to be considerd.
 
 The file `<filename>.mibs` contains the IBS similarity matrix. Calculating the IBS similarity matrix is a part of the plink functionality. For the N individuals in a sample,
-PLINK creates an N x N matrix of genome-wide average IBS pairwise identities. This matrix is created using the command plink --file mydata --cluster --matrix, which generates the file plink.mibs1. This file contains a square, symmetric matrix of the IBS distances for all pairs of individuals. These values range, in theory, from 0 to 11.
+PLINK creates an N x N matrix of genome-wide average IBS pairwise identities. This matrix is created using the command `plink --file mydata --cluster --matrix`, which generates the file plink.mibs1. This file contains a square, symmetric matrix of the IBS distances for all pairs of individuals. These values range, in theory, from 0 to 11.
 
 The IBS distance is calculated based on the average proportion of alleles shared at genotyped SNPs. It’s a measure of genetic similarity between two individuals. A higher IBS value indicates a higher degree of genetic similarity.
 
 In the context of PLINK, this IBS similarity matrix is used for clustering individuals based on their genetic similarity. This can be useful in a variety of applications, such as detecting sample contaminations, swaps and duplications, as well as pedigree errors and unknown familial relationships.
 
+## Get pairwise similarity loci
+The `getPairwiseSimilarityLoci` function, which is a wrapper for a Perl script, performs pairwise comparisons of genotypes. Specifically, it counts the number of complete pairwise comparisons, with no missing alleles, between each genotype. 
+
+In the context of this script, a pairwise comparison involves comparing two genotypes locus by locus. A locus is here a specific location of a gene or DNA sequence on a chromosome. When the script compares two genotypes, it checks each locus to see if the alleles (versions of a gene) are the same or different. 
+
+If a locus has no missing alleles in both genotypes, it's considered a complete pairwise comparison. The script counts the number of these complete pairwise comparisons for each pair of genotypes. This count is then written to an output file.
+
+This analysis can be useful in genetic studies to understand the similarity or dissimilarity between different individuals or species. It can help identify regions of the genome where there may be significant genetic variation, which could be associated with different traits or susceptibility to certain diseases. 
+
+Please note that the function does not return a value in the R environment. Instead, it creates an output file with the '.pairs' extension in the same directory as the input file. This output file contains the results of the pairwise similarity loci analysis. 
+
+The original code this function is based on can be found at the following URL: `https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl` 
+
+The basic usage of the function is
+
+```{r, eval=FALSE}
+getPairwiseSimilarityLoci(file="new_data.GOOD")
+```
+
+### Output
+
+The output file `<filename>.pairs` produced by the `getPairwiseSimilarityLoci` function contains a matrix that represents the results of the pairwise similarity loci analysis.
+
+Each row in the matrix corresponds to a genotype from the input PED file, and each column corresponds to another genotype. The value in the i-th row and j-th column of the matrix is the number of complete pairwise comparisons, with no missing alleles, between the i-th and j-th genotypes.
+
+A complete pairwise comparison at a specific locus means that both genotypes have non-missing alleles at that locus. The script counts the number of such loci for each pair of genotypes and writes this count to the corresponding cell in the matrix.
+
+In other words, the matrix provides a comprehensive overview of the pairwise similarities between all pairs of genotypes in the input PED file. The higher the value in a cell, the more similar the corresponding pair of genotypes are, in terms of non-missing alleles at each locus.

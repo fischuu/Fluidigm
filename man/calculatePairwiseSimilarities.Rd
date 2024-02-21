@@ -46,7 +46,8 @@ sex of the individuals.
 }
 \examples{
 \dontrun{
-  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE, verbose=TRUE, verbosity=1)
+  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE,
+                                verbose=TRUE, verbosity=1)
 }
 
 }

@@ -6,6 +6,9 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 70: Vignette chapter about getPairwiseSimilarityLoci added
+* 69: Additional and more detailed input checks for getPairwiseSimilarityLoci added
+* 68: Help file description for getPairwiseSimilarityLoci adjusted
 * 67: Vignette chapter about calculatePairwiseSimilarities added
 * 66: Additional and more detailed input checks for calculatePairwiseSimilarities added
 * 65: Help file description for calculatePairwiseSimilarities adjusted
