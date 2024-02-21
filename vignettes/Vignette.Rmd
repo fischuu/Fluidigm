@@ -64,6 +64,7 @@ library("devtools")
 install_github("fischuu/Fluidigm@dev")
 ```
 
+
 # Usage
 
 The package is designed to run one function after another, namely
@@ -362,4 +363,23 @@ If the `plots` parameter is set to `TRUE`, the function generates a histogram of
 CSV file with pairwise similarities. The function outputs all pairwise similarities that are greater than or equal to the similarity threshold to a CSV file. Each row in this file represents a pair of samples, and the columns contain the sample identifiers and the calculated similarity.
 
 Individual output files for each sample in the groups. If a group is specified, the function performs additional analysis for each sample in the group and generates individual output files for each sample. These files contain detailed results of the pairwise similarity analysis for each sample in the group.
+
+## Run all commands at once
+The `fluidigmAnalysisWrapper` function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to PLINK format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix, as described in the paragraphs above.
+
+To run the pipeline, you simply need to call the `fluidigmAnalysisWrapper` function with the appropriate parameters. The function first checks the input parameters and sets default values if necessary. It then runs the following functions in order: `fluidigm2PLINK`, `estimateErrors`, `calculatePairwiseSimilarities`, `getPairwiseSimilarityLoci`, and `similarityMatrix`. The function prints a completion message when all operations are done.
+
+The pipeline does not return a value. Instead, it creates output files in the same directory as the input files. These files contain the results of the pairwise similarity loci analysis and the similarity matrix.
+
+In the basic usage, you can trigger the entire pipeline by running
+
+```{r, eval=FALSE}
+res <- fluidigmAnalysisWrapper(file="example_data.csv",
+                               map="example_data.map",
+                               y.marker="DBY7",
+                               x.marker=c("BICF2P",
+                                          "BICF2P",
+                                          "BICF2S23"),
+                               out="new_data")
+```
 

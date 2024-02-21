@@ -2,7 +2,7 @@
 % Please edit documentation in R/similarityMatrix.R
 \name{similarityMatrix}
 \alias{similarityMatrix}
-\title{Run the fluidigm analysis script together}
+\title{Calculate the similarity matrix}
 \usage{
 similarityMatrix(
   file = NA,
@@ -17,38 +17,38 @@ similarityMatrix(
 )
 }
 \arguments{
-\item{file}{Path to the input file}
+\item{file}{Input file path. Default: NA.}
 
-\item{mibs.file}{Path to the mibs input file (only if name differs)}
+\item{mibs.file}{MIBS input file path. Default: NA.}
 
-\item{pairs.file}{Path to the pairs input file (only if name differs)}
+\item{pairs.file}{PAIRS input file path. Default: NA.}
 
-\item{ped.file}{Path to the pairs input file (only if name differs)}
+\item{ped.file}{PED input file path. Default: NA.}
 
-\item{group}{Sample identified for sample-wise statistics}
+\item{group}{Sample identifier for statistics. Default: NA.}
 
-\item{plots}{logical, shall plots be created?}
+\item{plots}{Should plots be created? Default: TRUE.}
 
-\item{similarity}{Threshold defining the level of similarity}
+\item{similarity}{Similarity threshold. Default: 0.85.}
 
-\item{verbose}{Should the output be verbose, logical}
+\item{verbose}{Should output be verbose? Default: TRUE.}
 
-\item{verbosity}{Level of verbosity, set to higher number for more details
-
-#' @details
-Additional details...}
+\item{verbosity}{Verbosity level. Default: 1.}
 }
 \value{
-A list containing the following elements:
-gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
-summs, a matrix with summary statistics
+Does not return a value. Creates output files in the same directory as the input files.
 }
 \description{
-This function is a wrapper for the whole analysis
+Performs pairwise similarity analysis on genotypic data.
+}
+\details{
+Reads genotype data, performs pairwise similarity calculations, generates plots, and outputs data for further analysis.
 }
 \examples{
 \dontrun{
-  similarityMatrix()
+  similarityMatrix(file = "mydata", mibs.file = "mymibs", pairs.file = "mypairs",
+                   ped.file = "myped", group = "mygroup", plots = TRUE, similarity = 0.85,
+                   verbose = TRUE, verbosity = 1)
 }
 
 }

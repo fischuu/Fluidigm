@@ -18,13 +18,17 @@
 #'
 #' @examples
 #' \dontrun{
-#'   similarityMatrix(file = "mydata", mibs.file = "mymibs", pairs.file = "mypairs", ped.file = "myped", group = "mygroup", plots = TRUE, similarity = 0.85, verbose = TRUE, verbosity = 1)
+#'   similarityMatrix(file = "mydata", mibs.file = "mymibs", pairs.file = "mypairs",
+#'                    ped.file = "myped", group = "mygroup", plots = TRUE, similarity = 0.85,
+#'                    verbose = TRUE, verbosity = 1)
 #' }
 #'
 #' @return Does not return a value. Creates output files in the same directory as the input files.
 #' @export
 
-similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, similarity=0.85, verbose=TRUE, verbosity=1){
+similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
+                             group=NA, plots=TRUE, similarity=0.85,
+                             verbose=TRUE, verbosity=1){
 
   ## Input checks
   #################################################
@@ -188,5 +192,5 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
     }
   }
 
-    if(verbose>0)cat("\n ### Similarity Matrix and groups: DONE! ",date(),"\n","##############################################################\n")
+    if(verbose>0) message("\n ### Similarity Matrix and groups: DONE! ",date(),"\n","##############################################################\n")
 }

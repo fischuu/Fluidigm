@@ -18,6 +18,9 @@
 #' database individuals) using another PLINK command. If the 'sexing' parameter is set to TRUE, the function will also attempt to determine the
 #' sex of the individuals.
 #'
+#' @references
+#' PLINK: Whole genome data analysis toolset - Harvard University
+#'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics

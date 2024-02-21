@@ -51,3 +51,6 @@ sex of the individuals.
 }
 
 }
+\references{
+PLINK: Whole genome data analysis toolset - Harvard University
+}

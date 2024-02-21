@@ -6,6 +6,8 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 73: Notes in DESCRIPTION file adjusted
+* 72: Package description added to the manual
 * 71: Help, function and vignette for similarityMatrix adjusted
 * 70: Vignette chapter about getPairwiseSimilarityLoci added
 * 69: Additional and more detailed input checks for getPairwiseSimilarityLoci added

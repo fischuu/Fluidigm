@@ -1,48 +1,55 @@
-#' @title Run the fluidigm analysis script together
+#' @title Run the Fluidigm Analysis Script Together
 #'
 #' @description
-#' This function is a wrapper for the whole analysis
+#' This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to PLINK format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
 #'
-#' @param file Path to the fluidigm input file
-#' @param out Out file name, keep empty to keep the original basename
-#' @param db Filepath to database file
-#' @param appendSamplesToDB Logical, shoud new samples be added to database
-#' @param map Filepath to PlateDnoY.map file
-#' @param keep.rep numeric, keep only this n-fold replicates, default n=2
-#' @param neg_controls Names of negative controls
-#' @param y.marker Y markers for sexing
-#' @param x.marker X markers for sexing
-#' @param sp.marker Markers used for species-identification
-#' @param plots logical, shall plots be created?
-#' @param allele_error Threshold for RERUN on Allele errors
-#' @param marker_dropout Threshold for RERUN on Marker dropout
-#' @param no_marker Number of markers
-#' @param male.y Threshold for sexing, male y-chromosome markers
-#' @param male.hetX Threshold for sexing, heterozygote x-chr markers
-#' @param female.y Threshold for sexing, female y-chromosome markers
-#' @param female.Xtot Threshold for sexing, total female x-chr markers
-#' @param female.hetXtot Threshold for sexing, heterozygote x-chr markers
-#' @param warning.noYtot  Threshold for sexing, when should warning be triggered
-#' @param warning.noHetXtot  Threshold for sexing, when should warning be triggered
-#' @param rearrange Logical, rearrange the ped/map output in order of ymap
-#' @param group Sample identified for sample-wise statistics
-#' @param fixNames logical, remove whitespaces from sample names automatically
-#' @param sexing Logical, if sexing should be performed
-#' @param verbose Should the output be verbose, logical or numerical
-#' @param verbosity Level of verbosity, set to higher number for more details
+#' @param file A string specifying the path to the Fluidigm input file.
+#' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
+#' @param db A string specifying the filepath to the database file. If not provided, the function will proceed with the existing data.
+#' @param appendSamplesToDB A logical indicating whether new samples should be added to the database. Default is FALSE.
+#' @param map A string specifying the filepath to the PlateDnoY.map file. If not provided, the function will use the map file with the same name as the ped file.
+#' @param keep.rep A numeric value indicating the number of replicates to keep. Default is 1.
+#' @param neg_controls A vector specifying the names of negative controls. Default is NA.
+#' @param y.marker A vector specifying the Y markers for sexing. Default is NA.
+#' @param x.marker A vector specifying the X markers for sexing. Default is NA.
+#' @param sp.marker A vector specifying the markers used for species identification. Default is NA.
+#' @param plots A logical indicating whether plots should be created. Default is TRUE.
+#' @param allele_error A numeric value specifying the threshold for RERUN on Allele errors. Default is 5.
+#' @param marker_dropout A numeric value specifying the threshold for RERUN on Marker dropout. Default is 15.
+#' @param no_marker A numeric value specifying the number of markers. Default is 50.
+#' @param male.y A numeric value specifying the threshold for sexing, male y-chromosome markers. Default is 3.
+#' @param male.hetX A numeric value specifying the threshold for sexing, heterozygote x-chr markers. Default is 0.
+#' @param female.y A numeric value specifying the threshold for sexing, female y-chromosome markers. Default is 0.
+#' @param female.Xtot A numeric value specifying the threshold for sexing, total female x-chr markers. Default is 8.
+#' @param female.hetXtot A numeric value specifying the threshold for sexing, heterozygote x-chr markers. Default is 3.
+#' @param warning.noYtot A numeric value specifying the threshold for sexing, when should warning be triggered. Default is 2.
+#' @param warning.noHetXtot A numeric value specifying the threshold for sexing, when should warning be triggered. Default is 3.
+#' @param rearrange A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.
+#' @param group A string specifying the sample identifier for statistics. Default is NA.
+#' @param fixNames A logical indicating whether whitespaces from sample names should be automatically removed. Default is TRUE.
+#' @param sexing A logical indicating whether sexing should be performed. Default is FALSE.
+#' @param verbose A logical or numerical value indicating whether the output should be verbose. Default is TRUE.
+#' @param verbosity A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.
 #'
-#' #' @details
-#' Additional details...
+#' @details
+#' The function first checks the input parameters and sets default values if necessary. It then runs the following functions in order:
+#' - fluidigm2PLINK: Converts the Fluidigm data to PLINK format.
+#' - estimateErrors: Estimates errors in the PLINK ped files.
+#' - calculatePairwiseSimilarities: Calculates pairwise similarities between genotypes.
+#' - getPairwiseSimilarityLoci: Determines the loci of pairwise similarities.
+#' - similarityMatrix: Calculates the similarity matrix.
+#' The function prints a completion message when all operations are done.
 #'
 #' @examples
 #' \dontrun{
-#'   fluidigmAnalysisWrapper()
+#'   fluidigmAnalysisWrapper(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 #' }
 #'
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
 #' @export
+
 
 fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE, map=NA, keep.rep=1,
                                     neg_controls=NA, y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE,
@@ -51,16 +58,21 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
                                     warning.noYtot=2, warning.noHetXtot=3,
                                     rearrange=TRUE, group=NA, fixNames=TRUE, sexing=TRUE, verbose=TRUE, verbosity=1){
 
-  if(!verbose & verbosity > 0) verbosity <- 0
-  verbose <- verbosity
-  ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
+#  if(!verbose & verbosity > 0) verbosity <- 0
+#  verbose <- verbosity
+#  ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
   if(sexing) if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
 
   filename <- basename(file)
   dirname <- dirname(file)
-  pedfile <- gsub("csv$","ped",filename)
-  plinkfile <- gsub("csv$","GOOD",filename)
+  if(!is.na(out)){
+    fluidigm_file <- paste0(out, ".csv")
+  } else {
+    fluidigm_file <- filename
+  }
+  pedfile <- gsub("csv$","ped",fluidigm_file)
+  plinkfile <- gsub("csv$","GOOD",fluidigm_file)
   path_plinkfile <- file.path(dirname,plinkfile)
   if(dirname==".") path_plinkfile <- gsub("./", "", path_plinkfile)
 
@@ -80,7 +92,7 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
                  verbose=verbose,
                  verbosity=verbosity)
 
-  out <- estimateErrors(file=file.path(dirname,pedfile),
+  out <- estimateErrors(file=pedfile,
                         db=db,
                         appendSamplesToDB=appendSamplesToDB,
                         keep.rep=keep.rep,
@@ -122,7 +134,7 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
                    verbose=verbose,
                    verbosity=verbosity)
 
-  if(verbose>0)cat("\n ### All DONE!",date(),"\n","##############################################################\n")
+  if(verbose>0)message("\n ### All DONE!",date(),"\n","##############################################################\n")
 
   out
 }

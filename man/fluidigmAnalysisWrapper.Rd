@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluidigmAnalysisWrapper.R
 \name{fluidigmAnalysisWrapper}
 \alias{fluidigmAnalysisWrapper}
-\title{Run the fluidigm analysis script together}
+\title{Run the Fluidigm Analysis Script Together}
 \usage{
 fluidigmAnalysisWrapper(
   file,
@@ -35,62 +35,59 @@ fluidigmAnalysisWrapper(
 )
 }
 \arguments{
-\item{file}{Path to the fluidigm input file}
+\item{file}{A string specifying the path to the Fluidigm input file.}
 
-\item{out}{Out file name, keep empty to keep the original basename}
+\item{out}{A string specifying the output file name. If left empty, the original basename of the input file will be used.}
 
-\item{db}{Filepath to database file}
+\item{db}{A string specifying the filepath to the database file. If not provided, the function will proceed with the existing data.}
 
-\item{appendSamplesToDB}{Logical, shoud new samples be added to database}
+\item{appendSamplesToDB}{A logical indicating whether new samples should be added to the database. Default is FALSE.}
 
-\item{map}{Filepath to PlateDnoY.map file}
+\item{map}{A string specifying the filepath to the PlateDnoY.map file. If not provided, the function will use the map file with the same name as the ped file.}
 
-\item{keep.rep}{numeric, keep only this n-fold replicates, default n=2}
+\item{keep.rep}{A numeric value indicating the number of replicates to keep. Default is 1.}
 
-\item{neg_controls}{Names of negative controls}
+\item{neg_controls}{A vector specifying the names of negative controls. Default is NA.}
 
-\item{y.marker}{Y markers for sexing}
+\item{y.marker}{A vector specifying the Y markers for sexing. Default is NA.}
 
-\item{x.marker}{X markers for sexing}
+\item{x.marker}{A vector specifying the X markers for sexing. Default is NA.}
 
-\item{sp.marker}{Markers used for species-identification}
+\item{sp.marker}{A vector specifying the markers used for species identification. Default is NA.}
 
-\item{plots}{logical, shall plots be created?}
+\item{plots}{A logical indicating whether plots should be created. Default is TRUE.}
 
-\item{allele_error}{Threshold for RERUN on Allele errors}
+\item{allele_error}{A numeric value specifying the threshold for RERUN on Allele errors. Default is 5.}
 
-\item{marker_dropout}{Threshold for RERUN on Marker dropout}
+\item{marker_dropout}{A numeric value specifying the threshold for RERUN on Marker dropout. Default is 15.}
 
-\item{no_marker}{Number of markers}
+\item{no_marker}{A numeric value specifying the number of markers. Default is 50.}
 
-\item{male.y}{Threshold for sexing, male y-chromosome markers}
+\item{male.y}{A numeric value specifying the threshold for sexing, male y-chromosome markers. Default is 3.}
 
-\item{male.hetX}{Threshold for sexing, heterozygote x-chr markers}
+\item{male.hetX}{A numeric value specifying the threshold for sexing, heterozygote x-chr markers. Default is 0.}
 
-\item{female.y}{Threshold for sexing, female y-chromosome markers}
+\item{female.y}{A numeric value specifying the threshold for sexing, female y-chromosome markers. Default is 0.}
 
-\item{female.Xtot}{Threshold for sexing, total female x-chr markers}
+\item{female.Xtot}{A numeric value specifying the threshold for sexing, total female x-chr markers. Default is 8.}
 
-\item{female.hetXtot}{Threshold for sexing, heterozygote x-chr markers}
+\item{female.hetXtot}{A numeric value specifying the threshold for sexing, heterozygote x-chr markers. Default is 3.}
 
-\item{warning.noYtot}{Threshold for sexing, when should warning be triggered}
+\item{warning.noYtot}{A numeric value specifying the threshold for sexing, when should warning be triggered. Default is 2.}
 
-\item{warning.noHetXtot}{Threshold for sexing, when should warning be triggered}
+\item{warning.noHetXtot}{A numeric value specifying the threshold for sexing, when should warning be triggered. Default is 3.}
 
-\item{rearrange}{Logical, rearrange the ped/map output in order of ymap}
+\item{rearrange}{A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.}
 
-\item{group}{Sample identified for sample-wise statistics}
+\item{group}{A string specifying the sample identifier for statistics. Default is NA.}
 
-\item{fixNames}{logical, remove whitespaces from sample names automatically}
+\item{fixNames}{A logical indicating whether whitespaces from sample names should be automatically removed. Default is TRUE.}
 
-\item{sexing}{Logical, if sexing should be performed}
+\item{sexing}{A logical indicating whether sexing should be performed. Default is FALSE.}
 
-\item{verbose}{Should the output be verbose, logical or numerical}
+\item{verbose}{A logical or numerical value indicating whether the output should be verbose. Default is TRUE.}
 
-\item{verbosity}{Level of verbosity, set to higher number for more details
-
-#' @details
-Additional details...}
+\item{verbosity}{A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.}
 }
 \value{
 A list containing the following elements:
@@ -98,11 +95,22 @@ gensim, a matrix indicating if genotypes are called correctly for replicates and
 summs, a matrix with summary statistics
 }
 \description{
-This function is a wrapper for the whole analysis
+This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to PLINK format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
+}
+\details{
+The function first checks the input parameters and sets default values if necessary. It then runs the following functions in order:
+\itemize{
+\item fluidigm2PLINK: Converts the Fluidigm data to PLINK format.
+\item estimateErrors: Estimates errors in the PLINK ped files.
+\item calculatePairwiseSimilarities: Calculates pairwise similarities between genotypes.
+\item getPairwiseSimilarityLoci: Determines the loci of pairwise similarities.
+\item similarityMatrix: Calculates the similarity matrix.
+The function prints a completion message when all operations are done.
+}
 }
 \examples{
 \dontrun{
-  fluidigmAnalysisWrapper()
+  fluidigmAnalysisWrapper(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 }
 
 }

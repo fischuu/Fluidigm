@@ -7,26 +7,33 @@
 getPairwiseSimilarityLoci(file, verbose = TRUE, verbosity = 1)
 }
 \arguments{
-\item{file}{Path to the previous plink created ped file (with ped extension)}
+\item{file}{A string. This is the path to the previously created PLINK ped file (with .ped extension). The ped file contains genotype information in a format that can be used for further analysis.}
 
-\item{verbose}{Should the output be verbose, logical}
+\item{verbose}{A logical. If TRUE, the function will print detailed messages during its execution to help you understand what it's doing at each step. Default is TRUE.}
 
-\item{verbosity}{Level of verbosity, set to higher number for more details
-
-#' @details
-Additional details...}
+\item{verbosity}{An integer. This parameter controls the level of verbosity. The higher the number, the more detailed the messages. Default is 1.}
 }
 \value{
-A list containing the following elements:
-gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
-summs, a matrix with summary statistics
+This function does not return a value in the R environment. Instead, it creates an output file with the
+'.pairs' extension in the same directory as the input file. This output file contains the results of the pairwise
+similarity loci analysis.
 }
 \description{
-This function is a wrapper to a perl script to determine the loci of pairwise similarities
+This function is a wrapper to a perl script that determines the loci of pairwise similarities. It is designed to work with data from the PLINK software, which is commonly used in bioinformatics for whole genome association analysis.
+}
+\details{
+This function first checks the input parameters. It then constructs the output file names and the command to run the perl script.
+The command is executed using the system function. If the 'verbose' parameter is set to TRUE, the function will print a message
+when it has finished running.
+
+The perl script was written by Doug Scofield, see references.
 }
 \examples{
 \dontrun{
-  getPairwiseSimilarityLoci()
+  getPairwiseSimilarityLoci(file = "new_data.GOOD", verbose = TRUE, verbosity = 2)
 }
 
+}
+\references{
+The original code this function is based on can be found at: GitHub https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl
 }
