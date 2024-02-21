@@ -1,3 +1,4 @@
+<div align=“right”> <img src=“logo.jpeg” alt=“Fluidigm logo”> </div>
 # Fluidigm
 Fluidigm is an R package that can analyze single-cell genotyping data from Fluidigm instruments. It can perform various operations such as:
 
