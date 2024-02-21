@@ -1,6 +1,5 @@
-<div align=“right”> <img src=“https://github.com/fischuu/Fluidigm/blob/master/logo.jpeg?raw=true)” alt=“Fluidigm logo”> </div>
+# Fluidigm <a href="https://github.com/fischuu/Fluidigm/tree/main"><img src="https://github.com/fischuu/Fluidigm/blob/main/logo.jpeg?raw=true)" align="right" height="138" /></a>
 
-# Fluidigm
 Fluidigm is an R package that can analyze single-cell genotyping data from Fluidigm instruments. It can perform various operations such as:
 
 * Converting the raw data into PLINK format
