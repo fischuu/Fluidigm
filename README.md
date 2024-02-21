@@ -1,16 +1,29 @@
 # Fluidigm
-Fluidigm data analysis r-package, a more detailed description and vignette with
-corresponding example data is on its way.
+Fluidigm is an R package that can analyze single-cell genotyping data from Fluidigm instruments. It can perform various operations such as:
+
+* Converting the raw data into PLINK format
+* Estimating genotyping errors
+* Calculating pairwise similarities
+* Determining pairwise similarity loci
+* Generating a similarity matrix
+
+Fluidigm provides a convenient interface to the powerful capabilities of the PLINK software, which is a free, open-source whole genome association analysis toolset. It also provides detailed output files and plots to help you explore and understand your genotypic data.
 
 # Installation
-You can install the package directly from GitHub using `devtools` like this
+You can install Fluidigm from CRAN with (soon...):
 
-```{r}
-devtools::install_github("fischuu/fluidigm")
+```
+install.packages("Fluidigm")
+```
+Or you can install the development version from GitHub with:
+
+```
+# install.packages("devtools")
+devtools::install_github("fischuu/Fluidigm")
 ```
 
 # Further requirements
-Please note, that you need to have Plink installed on your system and it needs to be available on the PATH.
+Please note, that you need to have Plink installed on your system and it needs to be available on the PATH variable.
 
 # Running example
 
@@ -49,12 +62,28 @@ Please note, that you need to have Plink installed on your system and it needs t
   
 # You can also run the individual steps  
 
-# First, turn the fluidigm output into Plink format
-  fluidigm2PLINK(file=NA, out=NA, map=NA, plots=TRUE, rearrange=TRUE, verbose=TRUE)
+fluidigm2PLINK(...)
+estimateErrors(...)
+calculatePairwiseSimilarities(...)
+getPairwiseSimilarityLoci(...)
+similarityMatrix(...)
+
 ```
 
+# License
+Fluidigm is licensed under the GPL-3 license. See the LICENSE file for more information.
+
+# Citation
+If you use Fluidigm in your research, please cite it as follows:
+
+```
+citation("Fluidigm")
+```
+
+Contact
+If you have any questions, suggestions, or feedback, please feel free to contact me. I would love to hear from you and improve the package. 🙌
 
 # Acknowledgements
-The pacakge uses also a perl script that was written by Doug Scofield and which is published here:
+The package uses also a perl script that was written by Doug Scofield and which is published here:
 
 https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl
