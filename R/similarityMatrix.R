@@ -1,32 +1,43 @@
-#' @title Run the fluidigm analysis script together
+#' @title Calculate the similarity matrix
 #'
 #' @description
-#' This function is a wrapper for the whole analysis
+#' Performs pairwise similarity analysis on genotypic data.
 #'
-#' @param file Path to the input file
-#' @param mibs.file Path to the mibs input file (only if name differs)
-#' @param pairs.file Path to the pairs input file (only if name differs)
-#' @param ped.file Path to the pairs input file (only if name differs)
-#' @param group Sample identified for sample-wise statistics
-#' @param plots logical, shall plots be created?
-#' @param similarity  Threshold defining the level of similarity
-#' @param verbose Should the output be verbose, logical
-#' @param verbosity Level of verbosity, set to higher number for more details
+#' @param file Input file path. Default: NA.
+#' @param mibs.file MIBS input file path. Default: NA.
+#' @param pairs.file PAIRS input file path. Default: NA.
+#' @param ped.file PED input file path. Default: NA.
+#' @param group Sample identifier for statistics. Default: NA.
+#' @param plots Should plots be created? Default: TRUE.
+#' @param similarity Similarity threshold. Default: 0.85.
+#' @param verbose Should output be verbose? Default: TRUE.
+#' @param verbosity Verbosity level. Default: 1.
 #'
-#' #' @details
-#' Additional details...
+#' @details
+#' Reads genotype data, performs pairwise similarity calculations, generates plots, and outputs data for further analysis.
 #'
 #' @examples
 #' \dontrun{
-#'   similarityMatrix()
+#'   similarityMatrix(file = "mydata", mibs.file = "mymibs", pairs.file = "mypairs", ped.file = "myped", group = "mygroup", plots = TRUE, similarity = 0.85, verbose = TRUE, verbosity = 1)
 #' }
 #'
-#' @return A list containing the following elements:
-#'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
-#'         summs, a matrix with summary statistics
+#' @return Does not return a value. Creates output files in the same directory as the input files.
 #' @export
 
 similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, group=NA, plots=TRUE, similarity=0.85, verbose=TRUE, verbosity=1){
+
+  ## Input checks
+  #################################################
+
+  # Check if 'verbose' is logical
+  if(!is.logical(verbose) || length(verbose) != 1){
+    stop("'verbose' must be a single logical value.")
+  }
+
+  # Check if 'verbosity' is numeric
+  if(!is.numeric(verbosity) || length(verbosity) != 1){
+    stop("'verbosity' must be a single numeric value.")
+  }
 
   if(!verbose & verbosity > 0) verbosity <- 0
   verbose <- verbosity
@@ -35,6 +46,34 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
   if(is.na(pairs.file)) pairs.file <- paste0(file,".pairs")
   if(is.na(ped.file)) ped.file <- paste0(file,".ped")
   dirname <- dirname(file)
+
+
+  # Check if 'file' is a character string
+  if(!is.character(file) || length(file) != 1){
+    stop("'file' must be a single character string representing the path to the main input file.")
+  }
+
+  # Check if 'mibs.file', 'pairs.file', and 'ped.file' are character strings
+  if(!is.character(mibs.file) || length(mibs.file) != 1){
+    stop("'mibs.file' must be a single character string representing the path to the MIBS input file.")
+  }
+  if(!is.character(pairs.file) || length(pairs.file) != 1){
+    stop("'pairs.file' must be a single character string representing the path to the PAIRS input file.")
+  }
+  if(!is.character(ped.file) || length(ped.file) != 1){
+    stop("'ped.file' must be a single character string representing the path to the PED input file.")
+  }
+
+  # Check if 'plots' is logical
+  if(!is.logical(plots) || length(plots) != 1){
+    stop("'plots' must be a single logical value.")
+  }
+
+  # Check if 'similarity' is numeric
+  if(!is.numeric(similarity) || length(similarity) != 1){
+    stop("'similarity' must be a single numeric value.")
+  }
+
   #####################################################################################################
 
   # Import similarity matrix
@@ -95,7 +134,7 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
 
   # output all pairwise similarities over 85%
     ddsim <- ddl[ddl$similarity>=similarity,]
-    write.table(ddsim, file=paste0(file,paste0("_similar_",similarity,"_genotypes.rout") ), quote=FALSE, sep=",", row.names=FALSE)
+    write.table(ddsim, file=paste0(file,paste0(".similar_",similarity,".genotypes.rout") ), quote=FALSE, sep=",", row.names=FALSE)
 
   if(!is.na(group)){
     ### RUN BELOW THIS ONLY IF YOU WANT SUMMARY OUTPUT FOR EACH SAMPLE SEPARATELLY ###********************************************
@@ -106,9 +145,9 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
     levels(newsamp$samp) <- c(levels(newsamp$samp),levels(ddl$sample1))
 
     # Create output file using a loop over all samples:
-    writeLines(paste0("Database matching for samples in file: ", name), paste0(file,"_individual.rout"))
-    cat("****************************************************************", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-    cat(" ", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
+    writeLines(paste0("Database matching for samples in file: ", name), paste0(file,".individual.rout"))
+    cat("****************************************************************", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+    cat(" ", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
 
     for(i in 1:nrow(newsamp)){
       # take all cases where sample 1 or 2 = current individual
@@ -129,23 +168,23 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA, 
 
       # take rows where match is against own run and against database
       # Add results to output
-      cat(paste("Matches for sample: ", newsamp[i,1], sep=""), file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat(paste("Number of loci typed in this sample: ", NL, sep=""), file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat(paste("Matches against same run: ", length(grep(group, sim$sample2, value=TRUE)), sep=""), file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat(paste("Matches against DataBase: ", length(grep(group, sim$sample2, value=TRUE, invert=TRUE)), sep=""), file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat(" ", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      write.table(sim,file=paste0(file,"_individual.rout"), append=TRUE, quote=FALSE, row.names=FALSE, sep=" ", col.names=FALSE)
-      cat(" ", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
+      cat(paste("Matches for sample: ", newsamp[i,1], sep=""), file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat(paste("Number of loci typed in this sample: ", NL, sep=""), file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat(paste("Matches against same run: ", length(grep(group, sim$sample2, value=TRUE)), sep=""), file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat(paste("Matches against DataBase: ", length(grep(group, sim$sample2, value=TRUE, invert=TRUE)), sep=""), file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat(" ", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      write.table(sim,file=paste0(file,".individual.rout"), append=TRUE, quote=FALSE, row.names=FALSE, sep=" ", col.names=FALSE)
+      cat(" ", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
 
       if(nrow(warn)>0){
-        cat("WARNING, similarities between 0.85 and 0.95:", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
+        cat("WARNING, similarities between 0.85 and 0.95:", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
 
-        write.table(warn, file=paste0(file,"_individual.rout"), append=TRUE, quote=FALSE, row.names=FALSE, sep=" ", col.names=FALSE)
+        write.table(warn, file=paste0(file,".individual.rout"), append=TRUE, quote=FALSE, row.names=FALSE, sep=" ", col.names=FALSE)
       }
 
-      cat(" ", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat("-----------------------------------------------------------------", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
-      cat(" ", file=paste0(file,"_individual.rout"),sep="\n", append=TRUE)
+      cat(" ", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat("-----------------------------------------------------------------", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
+      cat(" ", file=paste0(file,".individual.rout"),sep="\n", append=TRUE)
     }
   }
 

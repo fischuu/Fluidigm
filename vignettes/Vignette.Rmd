@@ -328,3 +328,38 @@ Each row in the matrix corresponds to a genotype from the input PED file, and ea
 A complete pairwise comparison at a specific locus means that both genotypes have non-missing alleles at that locus. The script counts the number of such loci for each pair of genotypes and writes this count to the corresponding cell in the matrix.
 
 In other words, the matrix provides a comprehensive overview of the pairwise similarities between all pairs of genotypes in the input PED file. The higher the value in a cell, the more similar the corresponding pair of genotypes are, in terms of non-missing alleles at each locus.
+
+## Similarity Matrix
+
+The similarityMatrix function is a key component of a genetic analysis pipeline. It performs a pairwise similarity analysis on genotypic data, which involves comparing each pair of genotypes in the dataset to determine how similar they are.
+
+The function takes as input a main file and optionally separate MIBS, PAIRS, and PED files. If these separate files are not provided, the function assumes they have the same base name as the main file with their respective extensions.
+
+The function reads the genotype data from these files and calculates the pairwise similarities. These similarities are then outputted to a CSV file. All pairwise similarities that are above a specified threshold (default is 0.85) are included in this output.
+
+If the plots parameter is set to TRUE, the function also generates histograms of the pairwise similarities and saves them as a PNG file. These plots provide a visual representation of the distribution of the pairwise similarities, which can be useful for understanding the overall structure and diversity of the genotypic data.
+
+If a group is specified, the function performs additional analysis for each sample in the group. This includes generating individual output files for each sample, which can be useful for performing sample-wise statistics.
+
+The verbose and verbosity parameters control the amount of detail printed during the execution of the function. If verbose is TRUE, the function prints messages during its execution to help you understand what it’s doing at each step. The verbosity parameter controls the level of detail in these messages.
+
+In summary, the similarityMatrix function is a powerful tool for genetic analysis. It provides a way to quantify the similarities between genotypes, which can be crucial for many downstream analyses such as clustering, classification, and association studies. By generating detailed output files and plots, it allows you to thoroughly explore and understand your genotypic data.
+
+The basic use is 
+
+```{r, eval = FALSE}
+similarityMatrix(file="new_data.GOOD")
+```
+
+### Output
+The similarityMatrix function generates several output files based on the analysis it performs:
+
+1. `<filename>.GOOD.pairwise_similarities.png`
+
+If the `plots` parameter is set to `TRUE`, the function generates a histogram of the pairwise similarities and saves it as a PNG file. This file provides a visual representation of the distribution of the pairwise similarities.
+
+2. `<filename>.similar_0.85.genotypes.rout`
+CSV file with pairwise similarities. The function outputs all pairwise similarities that are greater than or equal to the similarity threshold to a CSV file. Each row in this file represents a pair of samples, and the columns contain the sample identifiers and the calculated similarity.
+
+Individual output files for each sample in the groups. If a group is specified, the function performs additional analysis for each sample in the group and generates individual output files for each sample. These files contain detailed results of the pairwise similarity analysis for each sample in the group.
+

@@ -6,6 +6,7 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 71: Help, function and vignette for similarityMatrix adjusted
 * 70: Vignette chapter about getPairwiseSimilarityLoci added
 * 69: Additional and more detailed input checks for getPairwiseSimilarityLoci added
 * 68: Help file description for getPairwiseSimilarityLoci adjusted
