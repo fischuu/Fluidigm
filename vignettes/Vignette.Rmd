@@ -184,7 +184,14 @@ estErr.out <- estimateErrors(file="new_data.ped",
 ### Replicates
 The function can also handle replicates and negative controls inside the data. 
 
-<tbc>
+The function removes currently all samples that are more often present than indicated in the option `keep.rep` (Default: 1). The means, by default the function does not accept 
+replicated samples and removes *all* related samples that are repeated more than that. Replicates are here indicated by the same sample name. Consequently, the position on the plate needs to be recorded to match with the underlying library preparation. For each sample, the function checks if the first and second run of the sample have the same genotype. If they do, it adds the genotype to the consensus sequence. If there’s only one run of the sample, it adds the genotype from the single run to the consensus sequence.
+The function then calculates the allele error and marker dropout rates for each sample based on the replicates. The allele error rate is the number of mismatches between the replicates divided by the total number of alleles, and the marker dropout rate is the number of missing markers divided by the total number of markers.
+
+The names of the negative controls are passed to the function through the `neg_controls` parameter.
+If the `neg_controls` parameter is not `NA`, the function removes the negative controls from the data along with the samples that have too low/high repetition.
+
+Please note that the function does not perform any further specific handling or analysis of the negative controls beyond this point. The main purpose of removing the negative controls is to prevent them from influencing the error rate calculations and the consensus sequence generation.
 
 ### Output
 The function generates a couple of output files, namely
@@ -204,8 +211,7 @@ If the option `plots = TRUE` is set (default), also diagnostic plots are generat
 another shows the marker dropout rate (in percent) across all markers and then a scatterplot of the allele error rate versus the marker droput rate.
 
 In addition to that, the function provides the user also with a list, with two items `$gensim` and `$summs`. The `$gensim` list object provides information on the allele calls
-per marker and sample. The samples are in the columns, the alleles in the rows. If an allele was called, the matrix is set to `TRUE`, if a allele is missing, the entry is set 
-to `NA`. 
+per marker and sample. The samples are in the columns, the alleles in the rows. If an allele matched with the corresponding replicate, the matrix is set to `TRUE`, if there is a mismatch between replicates the value is set to `FALSE` and if a allele is missing, the entry is setto `NA`. However, if no replicates are present, the value can only either be `TRUE` or `NA`.
 
 The `$summs` gives an informative summary data frame, depending on the picked options not all columns are always present, though. 
 
@@ -236,3 +242,61 @@ The `$summs` gives an informative summary data frame, depending on the picked op
 | noSPX1 | Number of x-based species markers for replicate 1 | 
 | noSPX2 | Number of x-based species markers for replicate 2 | 
 | noSPXtot | Total number of x-based species markers |
+
+## Calculate pairwise similarities
+
+The `calculatePairwiseSimilarities` function is a powerful tool designed to calculate pairwise similarities between genotypes. This function
+serves as a wrapper to the PLINK software, which is a free, open-source whole genome association analysis toolset.
+
+The function takes as input a file path to the filtered ped/map file pair (without the ped/map file extension). This file contains the genotype
+data that the function will process and which is provided by `estimateErrors` earlier, with the `.GOOD.map/ped`-extension.
+
+Optionally, the function can also take a path to an existing genotype database. If provided, the function will merge the genotype output with
+this existing database. If a database is not provided, the function will proceed with the existing data.
+
+The function also accepts a filepath to a map file. If not provided, the function will use the map file with the same name as the ped file.
+
+The output path can also be specified. If not provided, the output will be written to a file with the same name as the input file, appended with “_oDB”.
+
+The function provides control over the verbosity of the output through the `verbose` and `verbosity` parameters. The `verbose` parameter is a logical
+value indicating whether the output should be verbose. The `verbosity` parameter is an integer representing the level of verbosity. Set it to a higher
+number for more detailed output.
+
+Once all parameters are set, the function first checks the input parameters and sets default values if necessary. It then constructs and executes
+a PLINK command to merge the genotype output with the existing genotype database (e.g. from previous runs) if one is provided. Finally, it calculates
+pairwise similarities for all samples (and database individuals) using another PLINK command.
+
+In summary, the calculatePairwiseSimilarities function is a comprehensive tool for calculating pairwise similarities between genotypes, with additional features for sex determination and integration with an existing genotype database. It provides a convenient interface to the powerful capabilities of the PLINK software, making it an essential tool for whole genome association analysis.
+
+The basic call is as follows
+
+```{r, eval = FALSE}
+calculatePairwiseSimilarities(file="new_data.GOOD")
+```
+
+This function essentially creates the required Plink command and executes it on the system-level. Per default, the function gives feedback, when the function is ready,
+but in case that `verbosity` is set to 2, the on-screen plink output is also displayed in R. In addition, the output is stored in the file `<filename>.log`.
+
+### Output
+
+The function generates a set of files, namely
+
+1. `<filename>.cluster0`
+2. `<filename>.cluster1`
+3. `<filename>.cluster2`
+4. `<filename>.cluster3`
+5. `<filename>.log`
+6. `<filename>.mibs`
+7. `<filename>.nosex`
+
+The four outputs `<filename>.cluster*` provide four different cluster solutions, the `log`-file contains the plink on-screen output. The file `<filename>.nosex` contains
+the list of samples with ambigous sex-codes. If the sexing did not go well (or was not requested earlier), this might lead to an exclusion of many/all samples, so here the
+additional option `sexing=FALSE` needs to be considerd.
+
+The file `<filename>.mibs` contains the IBS similarity matrix. Calculating the IBS similarity matrix is a part of the plink functionality. For the N individuals in a sample,
+PLINK creates an N x N matrix of genome-wide average IBS pairwise identities. This matrix is created using the command plink --file mydata --cluster --matrix, which generates the file plink.mibs1. This file contains a square, symmetric matrix of the IBS distances for all pairs of individuals. These values range, in theory, from 0 to 11.
+
+The IBS distance is calculated based on the average proportion of alleles shared at genotyped SNPs. It’s a measure of genetic similarity between two individuals. A higher IBS value indicates a higher degree of genetic similarity.
+
+In the context of PLINK, this IBS similarity matrix is used for clustering individuals based on their genetic similarity. This can be useful in a variety of applications, such as detecting sample contaminations, swaps and duplications, as well as pedigree errors and unknown familial relationships.
+

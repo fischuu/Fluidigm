@@ -8,7 +8,7 @@
 #' @param db A string representing the path to an existing genotype database. If not provided, the function will proceed with the existing data.
 #' @param map A string representing the filepath to PlateDnoY.map file. If not provided, the function will use the map file with the same name as the ped file.
 #' @param out A string representing the path to the output. If not provided, the output will be written to a file with the same name as the input file, appended with "_oDB".
-#' @param sexing A logical value indicating whether the function should try to perform sexing. Default is TRUE.
+#' @param sexing A logical value indicating whether the function should try to perform sexing. Default is FALSE.
 #' @param verbose A logical value indicating whether the output should be verbose. Default is TRUE.
 #' @param verbosity An integer representing the level of verbosity. Set to a higher number for more detailed output. Default is 1.
 #'
@@ -24,7 +24,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'   calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1)
+#'   calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE,
+#'                                 verbose=TRUE, verbosity=1)
 #' }
 #'
 #' @export
@@ -32,11 +33,29 @@
 
 calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1){
 
-   ### Input check
+   ### Input checks
    ##############################################################################
-   # Check if file exists
-   if (!file.exists(file)) {
-     stop("The specified file does not exist.")
+
+   # Check if file has .ped or .map extension
+   file_extension <- tools::file_ext(file)
+   if (file_extension == "ped" || file_extension == "map") {
+      # Remove the extension
+      file <- tools::file_path_sans_ext(file)
+
+      # Issue a warning if verbose is TRUE
+      if (verbose) {
+         warning("The file extension (.ped or .map) was removed from the input file name. The adjusted file name is: ", file)
+      }
+   }
+
+   # Check if .ped file exists
+   if (!file.exists(paste0(file, ".ped"))) {
+      stop("The specified .ped file does not exist.")
+   }
+
+   # Check if .map file exists
+   if (!file.exists(paste0(file, ".map"))) {
+      stop("The specified .map file does not exist.")
    }
 
    # Check if db exists
@@ -69,13 +88,13 @@ calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TR
    # Running plink
    # Merge the genotype output with the existing genotype database (example database included here "DataBase.ped"):
      if(is.na(db)){
-         if(verbose>0) cat("No database.ped provided, we just continue with the existing data!\n")
+         if(verbose>0) message("No database.ped provided, we just continue with the existing data!\n")
      } else {
-         if(verbose>0) cat("A database.ped is provided, we combine it with the existing data!\n")
+         if(verbose>0) message("A database.ped is provided, we combine it with the existing data!\n")
          plinkCommand <- paste0("plink --noweb --file ",file," --merge ",db," ",map," --recode --out ",out)
 
          if(verbose>1){
-             cat("Run the following PLINK command:\n", plinkCommand, "\n")
+             message("Run the following PLINK command:\n", plinkCommand, "\n")
          }
          # Run Plink
          system(plinkCommand, intern=intern.param)
@@ -90,10 +109,10 @@ calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TR
        plinkCommand <- paste0("plink --noweb --file ",out," --cluster --matrix --allow-no-sex --out ", out)
      }
      if(verbose>1){
-       cat("Run the following PLINK command:\n", plinkCommand)
+       message("Run the following PLINK command:\n", plinkCommand)
      }
      # Run Plink
      system(plinkCommand, intern.param)
 
-    if(verbose>0)cat("\n ### Calculating pairwise similarities: DONE! ",date(),"\n","##############################################################\n")
+    if(verbose>0) message("### Calculating pairwise similarities: DONE! ",date(),"\n","##############################################################\n")
 }

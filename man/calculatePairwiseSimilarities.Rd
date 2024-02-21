@@ -23,7 +23,7 @@ calculatePairwiseSimilarities(
 
 \item{out}{A string representing the path to the output. If not provided, the output will be written to a file with the same name as the input file, appended with "_oDB".}
 
-\item{sexing}{A logical value indicating whether the function should try to perform sexing. Default is TRUE.}
+\item{sexing}{A logical value indicating whether the function should try to perform sexing. Default is FALSE.}
 
 \item{verbose}{A logical value indicating whether the output should be verbose. Default is TRUE.}
 
@@ -46,7 +46,7 @@ sex of the individuals.
 }
 \examples{
 \dontrun{
-  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1)
+  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE, verbose=TRUE, verbosity=1)
 }
 
 }

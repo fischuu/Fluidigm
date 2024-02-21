@@ -35,7 +35,8 @@
 #' @export
 
 
-fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0", fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
+fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0",
+                           fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
 
   ### Input checks
   ##############################################################################

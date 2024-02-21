@@ -6,6 +6,10 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 67: Vignette chapter about calculatePairwiseSimilarities added
+* 66: Additional and more detailed input checks for calculatePairwiseSimilarities added
+* 65: Help file description for calculatePairwiseSimilarities adjusted
+* 64: Vignette updated for replicates and negative controls
 * 63: Bugfix: estimateErrors concidered sp.markers only when sexing was performed, they act no independent
 * 62: Changed sexing=FALSE as new default in estimateErrors()
 * 61: Added more careful input checks to estimateErrors
