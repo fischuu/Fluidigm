@@ -8,6 +8,7 @@
 #' @param file A string specifying the path to the input file in CSV format.
 #' @param map A string specifying the filepath to the map-file that should be used.
 #' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
+#' @param outdir A string specifying the output folder. If left empty the original folder path of the input file will be used.
 #' @param plots A logical indicating whether additional figures for conversion should be plotted. Default is TRUE.
 #' @param rearrange A logical indicating whether the ped/map output should be rearranged in order of provided map file. Default is TRUE.
 #' @param missing.geno A character string specifying how missing values should be coded. Default is "0 0".
@@ -23,19 +24,30 @@
 #'
 #' This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
 #'
+#' It might be so that marker names do not match between the csv and map file. This might happen, if special characters like ':' and '_'
+#' are used. An easy way to harmonize the files is to apply sed with the '-i' option to change the file directly like this:
+#'
+#' sed -i 's/:/_/g' \<filename\>
+#'
+#' In above command all ':' will be substituted by '_' in the file <filename>.
+#'
 #' @references
 #' PLINK: Whole genome data analysis toolset - Harvard University
 #'
 #' @examples
 #' \dontrun{
-#'   fluidigm2PLINK(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
+#'   file_path_csv <- system.file("extdata", "example_data.csv", package = "Fluidigm")
+#'   file_path_map <- system.file("extdata", "PlateD_withY.map", package = "Fluidigm")
+#'   outdir <- tempdir()
+#'
+#'   fluidigm2PLINK(file=file_path, map=file_path_map)
 #' }
 #'
 #' @return A list containing the ped/map file pair and optional diagnostic plots.
 #' @export
 
 
-fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0",
+fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0",
                            fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
 
   ### Input checks
@@ -46,7 +58,14 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
   if(is.na(map)) stop("Please provide a map file!")
   if(!file.exists(file)) stop("The file 'file' does not exist, please check the path!")
   if(!file.exists(map)) stop("The file 'map' does not exist, please check the path!")
-  if(!overwrite & is.na(out)) stop("No new name for output provided and old output is set to 'no overwrite'. Please change either!")
+  if(!overwrite & is.na(out)){
+    if(is.na(outdir)){
+      stop("Neither a new name for output nor an alternative output folder provided and old output is set to 'no overwrite'. Please change either!")
+    } else {
+      if(verbose>1) message("New output folder provided, hence the same name can be used with the overwrite option set to TRUE.")
+    }
+  }
+
 
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
@@ -61,6 +80,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, plots=TRUE, rearrange=TRUE, 
 
   # Extract the file and directory name
     dirname <- dirname(file)
+    if(!is.na(outdir)) dirname <- outdir
     filename.in <- basename(file)
     if(!is.na(out)) {
       filename.out <- out

@@ -6,6 +6,10 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 77: Added a FAQ section to the vignette to address the most common problems the package might cause
+* 76: Updated fluidigm2PLINK help to provide more details on harmonising marker names mismach issues
+* 75: New option 'outdir' in fluidigm2PLINK function
+* 74: Example dataset added
 * 73: Notes in DESCRIPTION file adjusted
 * 72: Package description added to the manual
 * 71: Help, function and vignette for similarityMatrix adjusted

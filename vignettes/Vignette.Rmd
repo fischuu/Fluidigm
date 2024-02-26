@@ -383,3 +383,17 @@ res <- fluidigmAnalysisWrapper(file="example_data.csv",
                                out="new_data")
 ```
 
+# FAQ
+
+1.Error in fluidigm2PLINK(file = file_path, map = file_path_map, outdir = outdir) : 
+  ERROR: You need to fix first the marker names before you can proceed!
+  
+There is a marker name mismatch between my fluidigm output and my provided map file
+This might happen... The function is not designed to fix those mismatches automatically but requires from the user some additional steps to fix those. The most common problem is a mixup of different special characters, e.g. in csv markers are called 'scaffold10:2782', while in the map file they are labelled as 'scaffold10_2782'. The suggested why to fix those is to harmonize the names to one and only character, e.g. '_'. You can do that by running sed in bash e.g. like this
+
+```{bash, eval=FALSE}
+sed -i 's/:/_/g' <filename>
+```
+
+Here, ':' will be substituted with '_'. The `-i`-option indicates that the file itself will be changed. Hence, take care that you backup your data before running this code to
+avoid data loss! Never work on the only copy of data you have, especially not if you plan to change the files!
