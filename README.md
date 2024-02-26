@@ -19,8 +19,8 @@ install.packages("Fluidigm")
 Or you can install the development version from GitHub with:
 
 ```
-# install.packages("devtools")
-devtools::install_github("fischuu/Fluidigm")
+# install.packages("remotes")
+remotes::install_github("fischuu/Fluidigm")
 ```
 
 # Further requirements

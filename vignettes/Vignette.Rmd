@@ -47,7 +47,7 @@ The `Fluidigm` development platform is GitHub. The main-branch is usually simila
 Cran are similar to Cran. Hence, the same version as Cran can be installed from GitHub
 
 ```{r, eval=FALSE}
-library("devtools")
+library("remotes")
 install_github("fischuu/Fluidigm")
 ```
 
