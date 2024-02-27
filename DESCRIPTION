@@ -12,7 +12,6 @@ License: GPL-3
 Encoding: UTF-8
 SystemRequirements: perl (>= 5.10.0), plink (>=1.07)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 Imports:
     data.table (>= 1.9.4),
     graphics,
