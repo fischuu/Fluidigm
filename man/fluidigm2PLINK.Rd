@@ -59,7 +59,7 @@ This function uses the PLINK software. For more information about PLINK, please 
 It might be so that marker names do not match between the csv and map file. This might happen, if special characters like ':' and '_'
 are used. An easy way to harmonize the files is to apply sed with the '-i' option to change the file directly like this:
 
-sed -i 's/:/_/g' \if{html}{\out{<filename>}}
+sed -i 's/:/_/g' \<filename\>
 
 In above command all ':' will be substituted by '_' in the file \if{html}{\out{<filename>}}.
 }

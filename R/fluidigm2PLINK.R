@@ -40,7 +40,7 @@
 #'   file_path_map <- system.file("extdata", "PlateD_withY.map", package = "Fluidigm")
 #'   outdir <- tempdir()
 #'
-#'   fluidigm2PLINK(file=file_path, map=file_path_map)
+#'   fluidigm2PLINK(file=file_path, map=file_path_map, outdir=outdir)
 #' }
 #'
 #' @return A list containing the ped/map file pair and optional diagnostic plots.
