@@ -27,8 +27,10 @@
 #'
 #' @examples
 #' \dontrun{
-#'   calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE,
-#'                                 verbose=TRUE, verbosity=1)
+#'
+#'   outdir <- tempdir()
+#'
+#'   calculatePairwiseSimilarities(file=file.path(outdir, "example_data.csv.GOOD"))
 #' }
 #'
 #' @export
@@ -45,9 +47,9 @@ calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TR
       # Remove the extension
       file <- tools::file_path_sans_ext(file)
 
-      # Issue a warning if verbose is TRUE
+      # Issue a message if verbose is TRUE
       if (verbose) {
-         warning("The file extension (.ped or .map) was removed from the input file name. The adjusted file name is: ", file)
+         message("The file extension (.ped or .map) was removed from the input file name. The adjusted file name is: ", file)
       }
    }
 

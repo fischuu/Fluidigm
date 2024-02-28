@@ -55,21 +55,14 @@ based on the information provided in the given map file. The function then creat
 If requested, the function also generates plots for genotyping success and additional summary statistics.
 
 This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
-
-It might be so that marker names do not match between the csv and map file. This might happen, if special characters like ':' and '_'
-are used. An easy way to harmonize the files is to apply sed with the '-i' option to change the file directly like this:
-
-sed -i 's/:/_/g' \<filename\>
-
-In above command all ':' will be substituted by '_' in the file \if{html}{\out{<filename>}}.
 }
 \examples{
 \dontrun{
   file_path_csv <- system.file("extdata", "example_data.csv", package = "Fluidigm")
-  file_path_map <- system.file("extdata", "PlateD_withY.map", package = "Fluidigm")
+  file_path_map <- system.file("extdata", "example_data_withY.map", package = "Fluidigm")
   outdir <- tempdir()
 
-  fluidigm2PLINK(file=file_path, map=file_path_map)
+  fluidigm2PLINK(file=file_path_csv, map=file_path_map, outdir=outdir)
 }
 
 }

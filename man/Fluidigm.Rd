@@ -2,8 +2,8 @@
 % Please edit documentation in R/Fluidigm-package.R
 \docType{package}
 \name{Fluidigm}
-\alias{Fluidigm-package}
 \alias{Fluidigm}
+\alias{Fluidigm-package}
 \title{Fluidigm}
 \description{
 Designed to streamline the process of analyzing genotyping data from Fluidigm machines, this package offers a suite of tools for data handling and analysis. It includes functions for converting Fluidigm data to PLINK format, estimating errors, calculating pairwise similarities, determining pairwise similarity loci, and generating a similarity matrix.

@@ -46,9 +46,7 @@ Reads genotype data, performs pairwise similarity calculations, generates plots,
 }
 \examples{
 \dontrun{
-  similarityMatrix(file = "mydata", mibs.file = "mymibs", pairs.file = "mypairs",
-                   ped.file = "myped", group = "mygroup", plots = TRUE, similarity = 0.85,
-                   verbose = TRUE, verbosity = 1)
+     similarityMatrix(file = file.path(outdir, "example_data.csv.GOOD"))
 }
 
 }

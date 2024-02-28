@@ -4,6 +4,7 @@
 #' This function processes the PLINK ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
 #'
 #' @param file A string. Path to the ped input file.
+#' @param outdir A string specifying the output folder. If left empty the original folder path of the input file will be used.
 #' @param db A string. Name of the used database. Default is NA.
 #' @param appendSamplesToDB A logical. Should new samples be added to database? Default is FALSE.
 #' @param keep.rep A numeric. Keep only this n-fold replicates, default n=1.
@@ -38,18 +39,50 @@
 #'
 #' @examples
 #' \dontrun{
-#'   estimateErrors(file = "your_file.ped")
+#'     # outdir is here the output directory from the fluidigm2PLINK function
+#'
+#'     # Estimate the errors with sexing applied
+#'     estimateErrors(file=file.path(outdir, "example_data.csv.ped"),
+#'                    keep.rep = 2)
+#'
+#'     # Estimate the errors and apply sexing with y and x markers defined
+#'     estimateErrors(file=file.path(outdir, "example_data.csv.ped"),
+#'                    keep.rep = 2,
+#'                    sexing=TRUE,
+#'                    y.marker = c("Y_scaffoldY158711_762",
+#'                                 "Y_scaffoldY42647_3017",
+#'                                 "Y_scaffoldY42656_3986"),
+#'                    x.marker = c("X_scaffold11905_7659",
+#'                                 "X_scaffold17088_4621",
+#'                                 "X_scaffold1915_14108",
+#'                                 "X_scaffold4825_648",
+#'                                 "X_scaffold5374_1437",
+#'                                 "X_scaffold10171:3154"))
+
 #' }
 #' @export
 
 
-estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
+estimateErrors <- function(file, outdir=NA, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
                            y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE, neg_controls=NA,
                            allele_error=5, marker_dropout=15, no_marker=50,
                            male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
                            warning.noYtot=2, warning.noHetXtot=3, sexing=FALSE, verbose=TRUE, verbosity=1){
 
   # Input checks
+
+  if(length(y.marker)==1){
+   ifelse(is.na(y.marker), y.marker.na <- TRUE, y.marker.na <- FALSE)
+  } else {
+    y.marker.na <- FALSE
+  }
+
+  if(length(x.marker)==1){
+    ifelse(is.na(x.marker), x.marker.na <- TRUE, x.marker.na <- FALSE)
+  } else {
+    x.marker.na <- FALSE
+  }
+
   if(!file.exists(file)){
     stop("The file does not exist. Please provide a valid file path.")
   }
@@ -66,7 +99,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
     stop("keep.rep should be a non-negative numeric value.")
   }
 
-  if(sexing && is.na(y.marker)){
+  if(sexing && y.marker.na){
     stop("You do not provide a vector with marker names to y.marker for sexing!")
   }
 
@@ -120,6 +153,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
 
   # Import sample genotypes:
     dirname <- dirname(file)
+    if(!is.na(outdir)) dirname <- outdir
     filename <- basename(file)
     mapfile <- gsub("ped$","map",filename)
     basename <- sub(".CMR.ped","",filename)
@@ -148,7 +182,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
 
 
  # Remove y-chromosome based markers
-  if(sum(!is.na(y.marker))>0 ){
+  if(!y.marker.na ){
     marker_pos <- NULL
     if(sum(is.numeric(y.marker))>0 | sum(y.marker=="Y")>0 ){
       marker_pos <- which(is.element(map1$V1, y.marker))
@@ -620,7 +654,7 @@ estimateErrors <- function(file, db=NA, appendSamplesToDB=FALSE, keep.rep=1,
       }
 
     # Create .map file without the Y-markers:
-      if(!is.na(y.marker)){
+      if(!y.marker.na){
         map.filename <- gsub(".ped", ".GOOD.map", filename)
         write.table(map1_wo_y, file = file.path(dirname, map.filename), quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
       } else {

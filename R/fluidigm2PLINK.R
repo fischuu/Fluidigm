@@ -24,12 +24,6 @@
 #'
 #' This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
 #'
-#' It might be so that marker names do not match between the csv and map file. This might happen, if special characters like ':' and '_'
-#' are used. An easy way to harmonize the files is to apply sed with the '-i' option to change the file directly like this:
-#'
-#' sed -i 's/:/_/g' \<filename\>
-#'
-#' In above command all ':' will be substituted by '_' in the file <filename>.
 #'
 #' @references
 #' PLINK: Whole genome data analysis toolset - Harvard University
@@ -37,10 +31,10 @@
 #' @examples
 #' \dontrun{
 #'   file_path_csv <- system.file("extdata", "example_data.csv", package = "Fluidigm")
-#'   file_path_map <- system.file("extdata", "PlateD_withY.map", package = "Fluidigm")
+#'   file_path_map <- system.file("extdata", "example_data_withY.map", package = "Fluidigm")
 #'   outdir <- tempdir()
 #'
-#'   fluidigm2PLINK(file=file_path, map=file_path_map, outdir=outdir)
+#'   fluidigm2PLINK(file=file_path_csv, map=file_path_map, outdir=outdir)
 #' }
 #'
 #' @return A list containing the ped/map file pair and optional diagnostic plots.
@@ -93,6 +87,7 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearr
     dd1 <- data.table::fread(file, skip=skip +1, header = TRUE)
   # Turn the data table into a data frame
     dd <- as.data.frame(unclass(dd1))
+    colnames(dd) <- colnames(dd1)
     dd$V2 <- as.factor(dd$V2)
   # Add new level to V2
     levels(dd$V2) <- c(levels(dd$V2),"Chipblank")

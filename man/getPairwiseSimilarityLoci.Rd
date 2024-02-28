@@ -30,7 +30,8 @@ The perl script was written by Doug Scofield, see references.
 }
 \examples{
 \dontrun{
-  getPairwiseSimilarityLoci(file = "new_data.GOOD", verbose = TRUE, verbosity = 2)
+  outdir <- tempdir()
+  getPairwiseSimilarityLoci(file = file.path(outdir, "example_data.csv.GOOD"))
 }
 
 }

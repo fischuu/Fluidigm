@@ -6,6 +6,7 @@
 \usage{
 estimateErrors(
   file,
+  outdir = NA,
   db = NA,
   appendSamplesToDB = FALSE,
   keep.rep = 1,
@@ -31,6 +32,8 @@ estimateErrors(
 }
 \arguments{
 \item{file}{A string. Path to the ped input file.}
+
+\item{outdir}{A string specifying the output folder. If left empty the original folder path of the input file will be used.}
 
 \item{db}{A string. Name of the used database. Default is NA.}
 
@@ -90,6 +93,24 @@ database file, if provided.
 }
 \examples{
 \dontrun{
-  estimateErrors(file = "your_file.ped")
+    # outdir is here the output directory from the fluidigm2PLINK function
+
+    # Estimate the errors with sexing applied
+    estimateErrors(file=file.path(outdir, "example_data.csv.ped"),
+                   keep.rep = 2)
+
+    # Estimate the errors and apply sexing with y and x markers defined
+    estimateErrors(file=file.path(outdir, "example_data.csv.ped"),
+                   keep.rep = 2,
+                   sexing=TRUE,
+                   y.marker = c("Y_scaffoldY158711_762",
+                                "Y_scaffoldY42647_3017",
+                                "Y_scaffoldY42656_3986"),
+                   x.marker = c("X_scaffold11905_7659",
+                                "X_scaffold17088_4621",
+                                "X_scaffold1915_14108",
+                                "X_scaffold4825_648",
+                                "X_scaffold5374_1437",
+                                "X_scaffold10171:3154"))
 }
 }

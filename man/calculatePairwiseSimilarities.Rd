@@ -46,8 +46,10 @@ sex of the individuals.
 }
 \examples{
 \dontrun{
-  calculatePairwiseSimilarities(file, db=NA, map=NA, out=NA, sexing=FALSE,
-                                verbose=TRUE, verbosity=1)
+
+  outdir <- tempdir()
+
+  calculatePairwiseSimilarities(file=file.path(outdir, "example_data.csv.GOOD"))
 }
 
 }

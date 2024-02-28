@@ -19,7 +19,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'   getPairwiseSimilarityLoci(file = "new_data.GOOD", verbose = TRUE, verbosity = 2)
+#'   outdir <- tempdir()
+#'   getPairwiseSimilarityLoci(file = file.path(outdir, "example_data.csv.GOOD"))
 #' }
 #'
 #' @return This function does not return a value in the R environment. Instead, it creates an output file with the
@@ -60,8 +61,9 @@ getPairwiseSimilarityLoci <- function(file, verbose=TRUE, verbosity=1){
   mibsfile <- paste0(file,".mibs")
 
   # Find the package and script directories
-  package.dir <- find.package('Fluidigm')
-  perl.dir <- file.path(package.dir,'perl')
+#  package.dir <- find.package('Fluidigm')
+  package.dir <- system.file(package = "Fluidigm", lib.loc = .libPaths()[1])
+  perl.dir <- file.path(package.dir ,'perl')
   script <- file.path(perl.dir,'pairwise-loci.pl')
 
   # Construct the command to run the perl script
@@ -73,7 +75,7 @@ getPairwiseSimilarityLoci <- function(file, verbose=TRUE, verbosity=1){
   }
 
   # Run the command
-  system(perlCommand, intern=intern.param)
+    system(perlCommand, ignore.stdout=FALSE, ignore.stderr=intern.param)
 
   # Print a completion message if 'verbose' is greater than 0
   if(verbose>0)message("### Get pairwise similarity loci: DONE! ",date(),"\n","##############################################################\n")
