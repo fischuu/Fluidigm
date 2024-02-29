@@ -79,8 +79,13 @@ fluidigmAnalysisWrapper <- function(file, out=NA, outdir=NA, db=NA, appendSample
   } else {
     fluidigm_file <- filename
   }
-  pedfile <- paste0(fluidigm_file, "ped")
-  plinkfile <- gsub("csv$","GOOD",fluidigm_file)
+  if(is.na(outdir)){
+    outdir <- dirname
+  } else {
+    dirname <- outdir
+  }
+  pedfile <- paste0(fluidigm_file, ".ped")
+  plinkfile <- paste0(fluidigm_file, ".GOOD")
   path_plinkfile <- file.path(dirname,plinkfile)
   if(dirname==".") path_plinkfile <- gsub("./", "", path_plinkfile)
 
@@ -102,7 +107,8 @@ fluidigmAnalysisWrapper <- function(file, out=NA, outdir=NA, db=NA, appendSample
                  verbose=verbose,
                  verbosity=verbosity)
 
-  out <- estimateErrors(file=pedfile,
+  out.ee <- estimateErrors(file=file.path(outdir, pedfile),
+                        outdir=outdir,
                         db=db,
                         appendSamplesToDB=appendSamplesToDB,
                         keep.rep=keep.rep,
@@ -153,5 +159,5 @@ fluidigmAnalysisWrapper <- function(file, out=NA, outdir=NA, db=NA, appendSample
 
   if(verbose>0)message("\n ### All DONE!",date(),"\n","##############################################################\n")
 
-  out
+  out.ee
 }

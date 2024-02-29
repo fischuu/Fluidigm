@@ -6,6 +6,8 @@
 
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
+* 88: testthat function for fluidigmAnalysisWrapper added
+* 87: Bugfix in fluidigmAnalysisWrapper that crashed the function call
 * 86: More verbose output added for verbosity>1
 * 85: Fixed the wrapper function and added missing options from individual function calls
 * 84: similarityMatrix tests added
