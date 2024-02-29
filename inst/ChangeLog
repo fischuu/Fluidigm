@@ -4,6 +4,8 @@
 #####                                                                      #####
 ################################################################################
 
+0.2: Stable release version that contains previous updates from versions 0.1.*
+
 0.1.*: UPDATES
 --------------------------------------------------------------------------------
 * 88: testthat function for fluidigmAnalysisWrapper added
