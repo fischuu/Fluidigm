@@ -26,6 +26,11 @@ remotes::install_github("fischuu/Fluidigm")
 # Further requirements
 Please note, that you need to have Plink installed on your system and it needs to be available on the PATH variable.
 
+On the Plink wegpage there are aleady precompiled binaries that can be downloaded, see here
+
+Plink 1.9  :  https://www.cog-genomics.org/plink/
+Plink 1.07 : https://zzz.bwh.harvard.edu/plink/download.shtml
+
 # Running example
 
 ```{r}
