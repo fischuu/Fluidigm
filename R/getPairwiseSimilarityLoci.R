@@ -31,6 +31,16 @@
 
 getPairwiseSimilarityLoci <- function(file, verbose=TRUE, verbosity=1){
 
+  ## Verbose output of input parameters
+  #################################################
+
+  if (verbosity >= 2) {
+    cat("Input parameters:\n")
+    cat("file: ", file, "\n")
+    cat("verbose: ", verbose, "\n")
+    cat("verbosity: ", verbosity, "\n")
+  }
+
   ### Input check
   ##############################################################################
   # Check if 'file' is a character string

@@ -42,7 +42,7 @@ fluidigm2PLINK(
 \item{verbosity}{A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.}
 }
 \value{
-A list containing the ped/map file pair and optional diagnostic plots.
+A ped/map file pair and optional diagnostic plots.
 }
 \description{
 This function takes a Fluidigm output file and converts it into a PLINK format. The PLINK format is a widely used genetic

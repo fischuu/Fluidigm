@@ -69,6 +69,35 @@ estimateErrors <- function(file, outdir=NA, db=NA, appendSamplesToDB=FALSE, keep
                            male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
                            warning.noYtot=2, warning.noHetXtot=3, sexing=FALSE, verbose=TRUE, verbosity=1){
 
+  ## Verbose output of input parameters
+  #################################################
+
+  if (verbosity >= 2) {
+    cat("Input parameters:\n")
+    cat("file: ", file, "\n")
+    cat("outdir: ", outdir, "\n")
+    cat("db: ", db, "\n")
+    cat("appendSamplesToDB: ", appendSamplesToDB, "\n")
+    cat("keep.rep: ", keep.rep, "\n")
+    cat("y.marker: ", y.marker, "\n")
+    cat("x.marker: ", x.marker, "\n")
+    cat("sp.marker: ", sp.marker, "\n")
+    cat("plots: ", plots, "\n")
+    cat("neg_controls: ", neg_controls, "\n")
+    cat("allele_error: ", allele_error, "\n")
+    cat("marker_dropout: ", marker_dropout, "\n")
+    cat("no_marker: ", no_marker, "\n")
+    cat("male.y: ", male.y, "\n")
+    cat("male.hetX: ", male.hetX, "\n")
+    cat("female.y: ", female.y, "\n")
+    cat("female.Xtot: ", female.Xtot, "\n")
+    cat("female.hetXtot: ", female.hetXtot, "\n")
+    cat("warning.noYtot: ", warning.noYtot, "\n")
+    cat("warning.noHetXtot: ", warning.noHetXtot, "\n")
+    cat("sexing: ", sexing, "\n")
+    cat("verbose: ", verbose, "\n")
+    cat("verbosity: ", verbosity, "\n")
+  }
   # Input checks
 
   if(length(y.marker)==1){

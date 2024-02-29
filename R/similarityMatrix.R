@@ -28,6 +28,23 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
                              group=NA, plots=TRUE, similarity=0.85,
                              verbose=TRUE, verbosity=1){
 
+  ## Verbose output of input parameters
+  #################################################
+
+  if (verbosity >= 2) {
+    cat("Input parameters:\n")
+    cat("file: ", file, "\n")
+    cat("mibs.file: ", mibs.file, "\n")
+    cat("pairs.file: ", pairs.file, "\n")
+    cat("ped.file: ", ped.file, "\n")
+    cat("group: ", group, "\n")
+    cat("plots: ", plots, "\n")
+    cat("similarity: ", similarity, "\n")
+    cat("verbose: ", verbose, "\n")
+    cat("verbosity: ", verbosity, "\n")
+  }
+
+
   ## Input checks
   #################################################
 

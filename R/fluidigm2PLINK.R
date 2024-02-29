@@ -37,12 +37,31 @@
 #'   fluidigm2PLINK(file=file_path_csv, map=file_path_map, outdir=outdir)
 #' }
 #'
-#' @return A list containing the ped/map file pair and optional diagnostic plots.
+#' @return A ped/map file pair and optional diagnostic plots.
 #' @export
 
 
 fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearrange=TRUE, missing.geno="0 0",
                            fixNames=TRUE, overwrite=FALSE, verbose=TRUE, verbosity=1){
+
+  ## Verbose output of input parameters
+  #################################################
+
+  if (verbosity >= 2) {
+    cat("Input parameters:\n")
+    cat("file: ", file, "\n")
+    cat("map: ", map, "\n")
+    cat("out: ", out, "\n")
+    cat("outdir: ", outdir, "\n")
+    cat("plots: ", plots, "\n")
+    cat("rearrange: ", rearrange, "\n")
+    cat("missing.geno: ", missing.geno, "\n")
+    cat("fixNames: ", fixNames, "\n")
+    cat("overwrite: ", overwrite, "\n")
+    cat("verbose: ", verbose, "\n")
+    cat("verbosity: ", verbosity, "\n")
+  }
+
 
   ### Input checks
   ##############################################################################

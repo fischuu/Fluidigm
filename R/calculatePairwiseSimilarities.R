@@ -38,6 +38,20 @@
 
 calculatePairwiseSimilarities <- function(file, db=NA, map=NA, out=NA, sexing=TRUE, verbose=TRUE, verbosity=1){
 
+  ## Verbose output of input parameters
+  #################################################
+
+  if (verbosity >= 2) {
+    cat("Input parameters:\n")
+    cat("file: ", file, "\n")
+    cat("db: ", db, "\n")
+    cat("map: ", map, "\n")
+    cat("out: ", out, "\n")
+    cat("sexing: ", sexing, "\n")
+    cat("verbose: ", verbose, "\n")
+    cat("verbosity: ", verbosity, "\n")
+  }
+
    ### Input checks
    ##############################################################################
 

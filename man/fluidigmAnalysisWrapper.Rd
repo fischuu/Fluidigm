@@ -7,6 +7,7 @@
 fluidigmAnalysisWrapper(
   file,
   out = NA,
+  outdir = NA,
   db = NA,
   appendSamplesToDB = FALSE,
   map = NA,
@@ -30,14 +31,19 @@ fluidigmAnalysisWrapper(
   group = NA,
   fixNames = TRUE,
   sexing = TRUE,
+  similarity = 0.85,
   verbose = TRUE,
-  verbosity = 1
+  verbosity = 1,
+  missing.geno = "0 0",
+  overwrite = FALSE
 )
 }
 \arguments{
 \item{file}{A string specifying the path to the Fluidigm input file.}
 
 \item{out}{A string specifying the output file name. If left empty, the original basename of the input file will be used.}
+
+\item{outdir}{A string specifying the output folder. If left empty the original folder path of the input file will be used.}
 
 \item{db}{A string specifying the filepath to the database file. If not provided, the function will proceed with the existing data.}
 
@@ -85,9 +91,15 @@ fluidigmAnalysisWrapper(
 
 \item{sexing}{A logical indicating whether sexing should be performed. Default is FALSE.}
 
+\item{similarity}{Similarity threshold. Default: 0.85.}
+
 \item{verbose}{A logical or numerical value indicating whether the output should be verbose. Default is TRUE.}
 
 \item{verbosity}{A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.}
+
+\item{missing.geno}{A character string specifying how missing values should be coded. Default is "0 0".}
+
+\item{overwrite}{A logical indicating wheter the original map file should be overwritten or not. Default FALSE}
 }
 \value{
 A list containing the following elements:
@@ -113,4 +125,13 @@ The function prints a completion message when all operations are done.
   fluidigmAnalysisWrapper(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 }
 
+}
+\seealso{
+\itemize{
+\item{\code{\link{fluidigm2PLINK}}: Converts the Fluidigm data to PLINK format.}
+\item{\code{\link{estimateErrors}}: Estimates errors in the PLINK ped files.}
+\item{\code{\link{calculatePairwiseSimilarities}}: Calculates pairwise similarities between genotypes.}
+\item{\code{\link{getPairwiseSimilarityLoci}}: Determines the loci of pairwise similarities.}
+\item{\code{\link{similarityMatrix}}: Calculates the similarity matrix.}
+}
 }

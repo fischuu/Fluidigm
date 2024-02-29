@@ -5,6 +5,7 @@
 #'
 #' @param file A string specifying the path to the Fluidigm input file.
 #' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
+#' @param outdir A string specifying the output folder. If left empty the original folder path of the input file will be used.
 #' @param db A string specifying the filepath to the database file. If not provided, the function will proceed with the existing data.
 #' @param appendSamplesToDB A logical indicating whether new samples should be added to the database. Default is FALSE.
 #' @param map A string specifying the filepath to the PlateDnoY.map file. If not provided, the function will use the map file with the same name as the ped file.
@@ -28,8 +29,11 @@
 #' @param group A string specifying the sample identifier for statistics. Default is NA.
 #' @param fixNames A logical indicating whether whitespaces from sample names should be automatically removed. Default is TRUE.
 #' @param sexing A logical indicating whether sexing should be performed. Default is FALSE.
+#' @param similarity Similarity threshold. Default: 0.85.
 #' @param verbose A logical or numerical value indicating whether the output should be verbose. Default is TRUE.
 #' @param verbosity A numerical value indicating the level of verbosity. Set to a higher number for more details. Default is 1.
+#' @param missing.geno A character string specifying how missing values should be coded. Default is "0 0".
+#' @param overwrite A logical indicating wheter the original map file should be overwritten or not. Default FALSE
 #'
 #' @details
 #' The function first checks the input parameters and sets default values if necessary. It then runs the following functions in order:
@@ -48,21 +52,25 @@
 #' @return A list containing the following elements:
 #'         gensim, a matrix indicating if genotypes are called correctly for replicates and/or if genotypes are missing
 #'         summs, a matrix with summary statistics
+#'
+#' @seealso
+#' \itemize{
+#'   \item{\code{\link{fluidigm2PLINK}}: Converts the Fluidigm data to PLINK format.}
+#'   \item{\code{\link{estimateErrors}}: Estimates errors in the PLINK ped files.}
+#'   \item{\code{\link{calculatePairwiseSimilarities}}: Calculates pairwise similarities between genotypes.}
+#'   \item{\code{\link{getPairwiseSimilarityLoci}}: Determines the loci of pairwise similarities.}
+#'   \item{\code{\link{similarityMatrix}}: Calculates the similarity matrix.}
+#' }
+#'
 #' @export
 
-
-fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE, map=NA, keep.rep=1,
+fluidigmAnalysisWrapper <- function(file, out=NA, outdir=NA, db=NA, appendSamplesToDB=FALSE, map=NA, keep.rep=1,
                                     neg_controls=NA, y.marker=NA, x.marker=NA, sp.marker=NA, plots=TRUE,
                                     allele_error=5, marker_dropout=15, no_marker=50,
                                     male.y=3, male.hetX=0, female.y=0, female.Xtot=8, female.hetXtot=3,
                                     warning.noYtot=2, warning.noHetXtot=3,
-                                    rearrange=TRUE, group=NA, fixNames=TRUE, sexing=TRUE, verbose=TRUE, verbosity=1){
-
-#  if(!verbose & verbosity > 0) verbosity <- 0
-#  verbose <- verbosity
-#  ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
-
-  if(sexing) if(is.na(y.marker)) stop("You do not provide a vector with marker names to y.marker!")
+                                    rearrange=TRUE, group=NA, fixNames=TRUE, sexing=TRUE, similarity=0.85, verbose=TRUE, verbosity=1,
+                                    missing.geno="0 0", overwrite=FALSE){
 
   filename <- basename(file)
   dirname <- dirname(file)
@@ -71,7 +79,7 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
   } else {
     fluidigm_file <- filename
   }
-  pedfile <- gsub("csv$","ped",fluidigm_file)
+  pedfile <- paste0(fluidigm_file, "ped")
   plinkfile <- gsub("csv$","GOOD",fluidigm_file)
   path_plinkfile <- file.path(dirname,plinkfile)
   if(dirname==".") path_plinkfile <- gsub("./", "", path_plinkfile)
@@ -82,13 +90,15 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
     newDB <- TRUE
   }
 
-
   fluidigm2PLINK(file=file,
                  out=out,
+                 outdir=outdir,
                  map=map,
                  plots=plots,
                  rearrange=rearrange,
+                 missing.geno=missing.geno,
                  fixNames=fixNames,
+                 overwrite=overwrite,
                  verbose=verbose,
                  verbosity=verbosity)
 
@@ -119,6 +129,8 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
 
   calculatePairwiseSimilarities(file=path_plinkfile,
                                 db=db,
+                                map=map,
+                                out=out,
                                 sexing=sexing,
                                 verbose=verbose,
                                 verbosity=verbosity)
@@ -130,7 +142,12 @@ fluidigmAnalysisWrapper <- function(file, out=NA, db=NA, appendSamplesToDB=FALSE
                             verbosity=verbosity)
 
   similarityMatrix(file=path_plinkfile,
+                   mibs.file=NA,
+                   pairs.file=NA,
+                   ped.file=NA,
                    group=group,
+                   plots=plots,
+                   similarity=similarity,
                    verbose=verbose,
                    verbosity=verbosity)
 
