@@ -63,12 +63,6 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearr
 
   ifelse(as.numeric(verbose)>0, verbose <- as.numeric(verbose) , verbose <- 0)
 
-
-  if(verbose){
-    if(length(grep(" ", file))>0) warning("There are whitespaces in your input file, this will most likely crash your plink system call!\n
-                                          My suggestion, change the whitespaces with underscores ('_')  and rerun.")
-  }
-
   ### Import the fluidigm data from csv file
   ##############################################################################
 
@@ -81,6 +75,12 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearr
     } else {
       filename.out <- filename.in
     }
+
+    if(verbose){
+      if(length(grep(" ", filename.out))>0) warning("There are whitespaces in your output filename (either specified in 'out' or they are already in the 'file' input name, in case you specified to keep the name), this will most likely crash your plink system call! ",
+                                            "My suggestion, substitute the whitespaces with underscores ('_')  and rerun.")
+    }
+
   # Read the fluidigm data into a data table
     tmp <- readLines(file)
     skip <- which(tmp=="SNP Converted Calls")
