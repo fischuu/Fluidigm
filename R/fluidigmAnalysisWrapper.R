@@ -1,7 +1,7 @@
 #' @title Run the Fluidigm Analysis Script Together
 #'
 #' @description
-#' This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to PLINK format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
+#' This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to 'PLINK' format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
 #'
 #' @param file A string specifying the path to the Fluidigm input file.
 #' @param out A string specifying the output file name. If left empty, the original basename of the input file will be used.
@@ -43,6 +43,12 @@
 #' - getPairwiseSimilarityLoci: Determines the loci of pairwise similarities.
 #' - similarityMatrix: Calculates the similarity matrix.
 #' The function prints a completion message when all operations are done.
+#'
+#' @references
+#' \itemize{
+#'   \item{Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MAR, Bender D, Maller J, Sklar P, de Bakker PIW, Daly MJ & Sham PC (2007)
+#'   \emph{PLINK: a toolset for whole-genome association and population-based linkage analysis.} American Journal of Human Genetics, 81.}
+#'   \item{Purcell, Shaun. PLINK. \url{https://zzz.bwh.harvard.edu/plink/}}}
 #'
 #' @examples
 #' \dontrun{

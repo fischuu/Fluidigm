@@ -7,7 +7,7 @@ Authors@R:
     person(given="Helena", family="Johansson", role = c("ctb", "fnd")),       
     person(given="Robert", family="Ekblom", role = c("aut"),
            comment = c(ORCID = "0000-0003-2222-1966")))
-Description: Designed to streamline the process of analyzing genotyping data from Fluidigm machines, this package offers a suite of tools for data handling and analysis. It includes functions for converting Fluidigm data to PLINK format, estimating errors, calculating pairwise similarities, determining pairwise similarity loci, and generating a similarity matrix.
+Description: Designed to streamline the process of analyzing genotyping data from Fluidigm machines, this package offers a suite of tools for data handling and analysis. It includes functions for converting Fluidigm data to format used by 'PLINK', estimating errors, calculating pairwise similarities, determining pairwise similarity loci, and generating a similarity matrix.
 License: GPL-3
 Encoding: UTF-8
 SystemRequirements: perl (>= 5.10.0), plink (>=1.07)

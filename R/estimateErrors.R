@@ -1,7 +1,7 @@
-#' @title Estimate Errors in PLINK ped files
+#' @title Estimate Errors in 'PLINK'' ped files
 #'
 #' @description
-#' This function processes the PLINK ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
+#' This function processes the 'PLINK' ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
 #'
 #' @param file A string. Path to the ped input file.
 #' @param outdir A string specifying the output folder. If left empty the original folder path of the input file will be used.
@@ -333,6 +333,15 @@ estimateErrors <- function(file, outdir=NA, db=NA, appendSamplesToDB=FALSE, keep
 
     if(plots){
       fig1.filename <- sub(".ped", ".allele_error_marker_dropout.png", filename)
+
+    # Restore old par settings, when function exists
+      oldpar <- par(no.readonly = TRUE)
+      on.exit({
+        oldpar$new <- NULL
+        par(oldpar)
+      })
+
+
       png(file.path(dirname, fig1.filename), width=1200, height=1200)
         par(mfrow=c(2,2), cex=1.2)
         hist(summs$Allele_error, breaks=50, xlim=c(0,100), main="", xlab="Allele Error (%)")

@@ -1,9 +1,9 @@
-#' @title Convert Fluidigm Output to PLINK Format
+#' @title Convert Fluidigm Output to 'PLINK' Format
 #'
 #' @description
-#' This function takes a Fluidigm output file and converts it into a PLINK format. The PLINK format is a widely used genetic
+#' This function takes a Fluidigm output file and converts it into a 'PLINK' format. The 'PLINK' ped/map format is a widely used genetic
 #' variation data format. This function is useful for researchers who want to analyze Fluidigm data using tools that accept
-#' PLINK format.
+#' 'PLINK' format.
 #'
 #' @param file A string specifying the path to the input file in CSV format.
 #' @param map A string specifying the filepath to the map-file that should be used.
@@ -29,13 +29,11 @@
 #' PLINK: Whole genome data analysis toolset - Harvard University
 #'
 #' @examples
-#' \dontrun{
 #'   file_path_csv <- system.file("extdata", "example_data.csv", package = "Fluidigm")
 #'   file_path_map <- system.file("extdata", "example_data_withY.map", package = "Fluidigm")
 #'   outdir <- tempdir()
 #'
 #'   fluidigm2PLINK(file=file_path_csv, map=file_path_map, outdir=outdir)
-#' }
 #'
 #' @return A ped/map file pair and optional diagnostic plots.
 #' @export
@@ -282,6 +280,14 @@ fluidigm2PLINK <- function(file=NA, map=NA, out=NA, outdir=NA, plots=TRUE, rearr
     if(plots){
        #fig3.filename <- sub(".csv", ".additional_summary_stats.png", filename)
        fig3.filename <- paste0(filename.out, ".additional_summary_stats.png")
+
+     # Restore old par settings, when function exists
+       oldpar <- par(no.readonly = TRUE)
+       on.exit({
+         oldpar$new <- NULL
+         par(oldpar)
+       })
+
        png(file.path(dirname, fig3.filename), width=1200, height=1200)
        par(mfrow=c(2,2))
        plot(1,1, type="n", axes=FALSE, ylab=" ", xlab=" ")

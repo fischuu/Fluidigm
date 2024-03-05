@@ -35,8 +35,8 @@ gensim, a matrix indicating if genotypes are called correctly for replicates and
 summs, a matrix with summary statistics
 }
 \description{
-This function serves as a wrapper to the PLINK software, which is a free, open-source whole genome association analysis toolset.
-It specifically uses PLINK to calculate pairwise similarities between genotypes.
+This function serves as a wrapper to the 'PLINK' software, which is a free, open-source whole genome association analysis toolset.
+It specifically uses 'PLINK' to calculate pairwise similarities between genotypes.
 }
 \details{
 The function first checks the input parameters and sets default values if necessary. It then constructs and executes a PLINK command to merge
@@ -54,5 +54,8 @@ sex of the individuals.
 
 }
 \references{
-PLINK: Whole genome data analysis toolset - Harvard University
+\itemize{
+\item{Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MAR, Bender D, Maller J, Sklar P, de Bakker PIW, Daly MJ & Sham PC (2007)
+\emph{PLINK: a toolset for whole-genome association and population-based linkage analysis.} American Journal of Human Genetics, 81.}
+\item{Purcell, Shaun. PLINK. \url{https://zzz.bwh.harvard.edu/plink/}}}
 }

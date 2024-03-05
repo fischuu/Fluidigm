@@ -1,7 +1,7 @@
 #' @title Get Pairwise Similarity Loci
 #'
 #' @description
-#' This function is a wrapper to a perl script that determines the loci of pairwise similarities. It is designed to work with data from the PLINK software, which is commonly used in bioinformatics for whole genome association analysis.
+#' This function is a wrapper to a perl script that determines the loci of pairwise similarities. It is designed to work with data from the 'PLINK' software, which is commonly used in bioinformatics for whole genome association analysis.
 #'
 #' @param file A string. This is the path to the previously created PLINK ped file (with .ped extension). The ped file contains genotype information in a format that can be used for further analysis.
 #' @param verbose A logical. If TRUE, the function will print detailed messages during its execution to help you understand what it's doing at each step. Default is TRUE.

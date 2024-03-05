@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluidigm2PLINK.R
 \name{fluidigm2PLINK}
 \alias{fluidigm2PLINK}
-\title{Convert Fluidigm Output to PLINK Format}
+\title{Convert Fluidigm Output to 'PLINK' Format}
 \usage{
 fluidigm2PLINK(
   file = NA,
@@ -45,9 +45,9 @@ fluidigm2PLINK(
 A ped/map file pair and optional diagnostic plots.
 }
 \description{
-This function takes a Fluidigm output file and converts it into a PLINK format. The PLINK format is a widely used genetic
+This function takes a Fluidigm output file and converts it into a 'PLINK' format. The 'PLINK' ped/map format is a widely used genetic
 variation data format. This function is useful for researchers who want to analyze Fluidigm data using tools that accept
-PLINK format.
+'PLINK' format.
 }
 \details{
 The function first checks the input parameters and then imports the Fluidigm data from the CSV file. It creates a new MAP file
@@ -57,13 +57,11 @@ If requested, the function also generates plots for genotyping success and addit
 This function uses the PLINK software. For more information about PLINK, please refer to the official documentation.
 }
 \examples{
-\dontrun{
   file_path_csv <- system.file("extdata", "example_data.csv", package = "Fluidigm")
   file_path_map <- system.file("extdata", "example_data_withY.map", package = "Fluidigm")
   outdir <- tempdir()
 
   fluidigm2PLINK(file=file_path_csv, map=file_path_map, outdir=outdir)
-}
 
 }
 \references{

@@ -19,7 +19,7 @@ This function does not return a value in the R environment. Instead, it creates 
 similarity loci analysis.
 }
 \description{
-This function is a wrapper to a perl script that determines the loci of pairwise similarities. It is designed to work with data from the PLINK software, which is commonly used in bioinformatics for whole genome association analysis.
+This function is a wrapper to a perl script that determines the loci of pairwise similarities. It is designed to work with data from the 'PLINK' software, which is commonly used in bioinformatics for whole genome association analysis.
 }
 \details{
 This function first checks the input parameters. It then constructs the output file names and the command to run the perl script.

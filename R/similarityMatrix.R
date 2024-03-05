@@ -129,10 +129,14 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
     ddant <- as.matrix(ant)
     # Switch off the warnings, see this discussion on it:
     # https://stackoverflow.com/questions/69666867/constant-warning-message-with-reshapemelt-in-r
-    oldw <- getOption("warn")
-    options(warn = -1)
-      ddant2 <- reshape::melt(ddant)[reshape::melt(upper.tri(ddant))$value,]
-    options(warn = oldw)
+    #oldw <- getOption("warn")
+    #options(warn = -1)
+    #  ddant2 <- reshape::melt(ddant)[reshape::melt(upper.tri(ddant))$value,]
+    #options(warn = oldw)
+    # Use suppressWarnings instead the restting of options
+    ddant2 <- suppressWarnings({
+      reshape::melt(ddant)[reshape::melt(upper.tri(ddant))$value,]
+    })
     ddl$noLoci <- ddant2$value
 
   # get the number of loci typed for each sample (diagonal from ddant)
@@ -144,6 +148,15 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
   # check and plot the data
     if(plots){
       fig1.filename <- paste0(file, ".pairwise_similarities.png")
+
+    # Restore old par settings, when function exists
+      oldpar <- par(no.readonly = TRUE)
+      on.exit({
+        oldpar$new <- NULL
+        par(oldpar)
+      })
+
+
       png(fig1.filename, width=1200, height=800)
         par(mfrow=c(1,2))
         hist(ddl$similarity, breaks=50, main="", xlab="Pairwise similarities")

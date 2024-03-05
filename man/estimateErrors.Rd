@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateErrors.R
 \name{estimateErrors}
 \alias{estimateErrors}
-\title{Estimate Errors in PLINK ped files}
+\title{Estimate Errors in 'PLINK'' ped files}
 \usage{
 estimateErrors(
   file,
@@ -83,7 +83,7 @@ gensim, a matrix indicating if genotypes are called correctly for replicates and
 summs, a matrix with summary statistics
 }
 \description{
-This function processes the PLINK ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
+This function processes the 'PLINK' ped files and estimates errors. It also performs sex assignment and species marker analysis if required.
 }
 \details{
 This function processes the PLINK ped files and estimates errors. It checks if the first and second run of each sample have the same genotype and if both

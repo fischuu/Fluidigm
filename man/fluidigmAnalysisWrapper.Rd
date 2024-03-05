@@ -107,7 +107,7 @@ gensim, a matrix indicating if genotypes are called correctly for replicates and
 summs, a matrix with summary statistics
 }
 \description{
-This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to PLINK format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
+This function serves as a wrapper for the entire analysis pipeline. It takes a Fluidigm input file and performs several operations including conversion to 'PLINK' format, error estimation, calculation of pairwise similarities, determination of pairwise similarity loci, and calculation of the similarity matrix.
 }
 \details{
 The function first checks the input parameters and sets default values if necessary. It then runs the following functions in order:
@@ -125,6 +125,12 @@ The function prints a completion message when all operations are done.
   fluidigmAnalysisWrapper(file="path/to/your/file.csv", map="path/to/your/mapfile.map")
 }
 
+}
+\references{
+\itemize{
+\item{Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MAR, Bender D, Maller J, Sklar P, de Bakker PIW, Daly MJ & Sham PC (2007)
+\emph{PLINK: a toolset for whole-genome association and population-based linkage analysis.} American Journal of Human Genetics, 81.}
+\item{Purcell, Shaun. PLINK. \url{https://zzz.bwh.harvard.edu/plink/}}}
 }
 \seealso{
 \itemize{
