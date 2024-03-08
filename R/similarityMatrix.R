@@ -127,12 +127,8 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
     ant <- read.table(pairs.file)
 
     ddant <- as.matrix(ant)
-    # Switch off the warnings, see this discussion on it:
+    # Suppress the warnings, see this discussion on it:
     # https://stackoverflow.com/questions/69666867/constant-warning-message-with-reshapemelt-in-r
-    #oldw <- getOption("warn")
-    #options(warn = -1)
-    #  ddant2 <- reshape::melt(ddant)[reshape::melt(upper.tri(ddant))$value,]
-    #options(warn = oldw)
     # Use suppressWarnings instead the restting of options
     ddant2 <- suppressWarnings({
       reshape::melt(ddant)[reshape::melt(upper.tri(ddant))$value,]
