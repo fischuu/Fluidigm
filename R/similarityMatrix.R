@@ -115,10 +115,9 @@ similarityMatrix <- function(file=NA, mibs.file=NA, pairs.file=NA, ped.file=NA,
     dd <- as.matrix(mat)
   # Switch off the warnings, see this discussion on it:
   # https://stackoverflow.com/questions/69666867/constant-warning-message-with-reshapemelt-in-r
-    oldw <- getOption("warn")
-    options(warn = -1)
-      ddl <- reshape::melt(dd)[reshape::melt(upper.tri(dd))$value,]
-    options(warn = oldw)
+    ddl <- suppressWarnings({
+        reshape::melt(dd)[reshape::melt(upper.tri(dd))$value,]
+      })
     names(ddl) <- c("sample1", "sample2", "similarity")
     levels(ddl$sample1) <- c(levels(ddl$sample1), levels(ddl$sample2))
     levels(ddl$sample2) <- levels(ddl$sample1)
