@@ -1,4 +1,4 @@
-# Fluidigm <a href="https://github.com/fischuu/Fluidigm/tree/main"><img src="https://github.com/fischuu/Fluidigm/blob/main/logo.jpeg?raw=true)" align="right" height="138" /></a>
+# Fluidigm <a href="https://github.com/fischuu/Fluidigm/tree/main"><img src="https://github.com/fischuu/Fluidigm/blob/main/inst/extdata/logo.jpeg?raw=true)" align="right" height="138" /></a>
 
 Fluidigm is an R package that can analyze genotyping data from Fluidigm instruments. It can perform various operations such as:
 
