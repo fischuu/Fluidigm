@@ -10,6 +10,8 @@ Fluidigm is an R package that can analyze genotyping data from Fluidigm instrume
 
 Fluidigm provides a convenient interface to the powerful capabilities of the PLINK software, which is a free, open-source whole genome association analysis toolset. It also provides detailed output files and plots to help you explore and understand your genotypic data.
 
+URL of the GitHub repository: https://github.com/fischuu/Fluidigm
+
 # Installation
 You can install Fluidigm from CRAN with (soon...):
 
