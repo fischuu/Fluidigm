@@ -1,5 +1,5 @@
 ---
-title: 'Fluidigm: A R package for fluidigm data handling, sexing and clustering'
+title: 'Fluidigm: An R-package for fluidigm data handling, sexing and clustering'
 output:
   pdf_document:
     keep_md: true
@@ -36,7 +36,7 @@ affiliations:
   index: 3
 - name: Natural Resources Institute Finland (Luke), Applied Statistical Methods, Jokioinen, Finland
   index: 4
-date: "20 March 2024"
+date: "22 March 2024"
 bibliography: paper.bib
 ---
 
@@ -47,9 +47,9 @@ options(width = 68, cli.unicode = FALSE, cli.width = 68)
 
 # Summary
 The R-package `Fluidigm` is a comprehensive tool for analyzing genotypic data, as created by using
-nanofluidic dynamic arrays from a sequencer called Fluidigm [@wang2009]. Genotypic data refers here
+nanofluidic dynamic arrays from Standard BioTools Inc., previously known as Fluidigm [@wang2009]. Genotypic data refers here
 to the genetic makeup of an organism, encoded in its DNA, which determines its physical and physiological
-traits. This data can represent the entire present genetic variation, with millions of single-nucleotide
+traits. This data can represent the entire genetic variation, with millions of single-nucleotide
 polymorphisms (SNP) and is crucial in understanding an organism’s characteristics and can, among others, be
 used for species identification and sexing. However, the Fluidigm instrument generates very cost-effective
 up to 96 representative SNPs—key markers that provide insights into an individual’s genetic diversity.
@@ -63,7 +63,7 @@ and dog DNA based on collected and sequenced tissue samples. This capability mak
 the field of genetic studies, wildlife ecology and biomonitoring.
 
 Our software takes the raw genotypic data and transforms it into a format suitable for further analysis.
-It then estimates potential errors, in form of sequencing errors, in the data, ensuring its accuracy and
+It then estimates potential errors, e.g., in form of sequencing errors, from the data, ensuring its accuracy and
 reliability. The software also has the capability to perform sex assignment and species marker analysis,
 if required.
 
@@ -90,7 +90,7 @@ functions for SNP data to our knowledge. Similar functions for microsatellite ma
 [@lonsinger2015].
  
 SNP panels are becoming increasingly sophisticated by incorporating more and more functions such as diagnostic
-species markers [@harmoinen2024] or Y and/or X chromosomal markers [@ekblom2021] for diagnosing sex. This require
+species markers [@harmoinen2024] or Y and/or X chromosomal markers [@ekblom2021] for diagnosing sex. This requires
 flexible analytical tools to handle these data in a way that is informative, for example by determining sex
 according to rules set by the user, or sum the number of successful markers to indicate whether a species assignment
 is reliable. Similarly, flexibility in the number of SNPs and number of samples per analysis batch is important
@@ -122,8 +122,8 @@ fluidigm2PLINK(file = "example_data.csv",
                out = "new_data")
 ```
 
-The `estimateErrors` function is designed to process PLINK ped files and estimate errors. It offers a
-comprehensive analysis of genotyping data, ensuring the accuracy and reliability of your results.
+The `estimateErrors` function is designed to process the generated PLINK ped files and estimate errors. It offers a
+comprehensive analysis of genotyping data, ensuring the accuracy and reliability of the results.
 This function is particularly useful in large-scale genetic studies where error estimation is vital
 for maintaining data integrity.
 
@@ -134,11 +134,11 @@ in the function call) for sexing and species-identification markers for species 
 The function is highly customizable, allowing users to specify various parameters such as the path to
 the ped input file, the database name, and whether new samples should be added to the database. It also
 allows users to control the number of replicates to keep, the markers for sexing and species identification,
-and the thresholds for various error checks.
-(INTRODUCE HERE STILL THE IDEA OF THE DATABASE, WHAT IS IT AND WHATFOR IS IT NEEDED!)
+and the thresholds for various error checks. Further, the function can create a database to store already sequences
+samples and use them in subsequent analyses.
 
 In addition, `estimateErrors` can generate plots for visual inspection of the data and provides verbose
-output for a detailed analysis. It returns a list containing a matrix indicating if genotypes are called
+output for a detailed function feedback. It returns a list containing a matrix indicating if genotypes are called
 correctly for replicates and/or if genotypes are missing, and a matrix with summary statistics.
 
 The basic usage in the running example is as follows:
@@ -154,8 +154,8 @@ The function requires a file path to the filtered ped/map file pair, without the
 This file contains the genotype data that the function will process and which was provided by `estimateErrors`
 earlier. These files have then a `.GOOD.map/ped`-file extension.
 
-Optionally, the function can also accept a path to an existing genotype database. Or, in case of its absense,
-it can also create such a database. If provided, the function will merge the genotype output with this existing
+Optionally, the function can also accept a path to an existing sample database. Or, in case of its absense,
+it can also create such a database. If provided, the function will merge the output with this existing
 database. If a database is not provided, the function will proceed with the existing data only.
 
 The basic call is as follows:
@@ -181,7 +181,7 @@ between different individuals or species. It can aid in identifying regions of t
 genetic variation, potentially associated with diverse traits or susceptibility to certain diseases.
 
 The function does not return a value in the R environment. Instead, it generates an output file with
-the `.pairs`-extension in the same directory as the input file. This output file encapsulates the
+a `.pairs`-extension in the same directory as the input file. This output file encapsulates the
 results of the pairwise similarity loci analysis.
 
 The basic usage of the function is:
@@ -191,7 +191,7 @@ getPairwiseSimilarityLoci(file="new_data.GOOD")
 ```
 
 The `similarityMatrix` function serves as the final component in this genetic analysis pipeline.
-It conducts a pairwise similarity analysis on genotypic data, comparing each pair of genotypes in
+It conducts a pairwise similarity analysis on the genotypic data, comparing each pair of genotypes in
 the dataset to ascertain their similarity.
 
 The function accepts a main file and, optionally, separate `MIBS`, `PAIRS`, and `PED` files. If these
@@ -217,9 +217,9 @@ similarityMatrix(file="new_data.GOOD")
 ```
 
 # Availability
-The package is a available in a stable version on Cran, see https://cran.r-project.org/web/packages/Fluidigm.
+The package is available in a stable release version on Cran, see https://cran.r-project.org/web/packages/Fluidigm.
 Latest development versions can be found in the `dev` branch of the corresponding GitHub repository
-(https://github.com/fischuu/Fluidigm), whereas the `main` branch is aligned to the latest Cran release.
+(https://github.com/fischuu/Fluidigm), whereas the `main` branch is always aligned to the latest Cran release.
 
 # Acknowledgement
 The original perl code from the `getPairwiseSimilarityLoci` function is based on the code behind the following URL: https://github.com/douglasgscofield/bioinfo/blob/main/scripts/plink-pairwise-loci.pl
